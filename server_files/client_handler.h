@@ -34,8 +34,10 @@ void sendAll(ClientList *client, char *msg)
 void online(ClientList *client)
 {
     char msg[201];
-    int i, count = 0;
+    memset(msg,0,sizeof(msg));
+    int i,count = 1;
     ClientList *tmp = (ClientList *)head->next;
+    msg[0] = '\r';
     while (tmp != NULL)
     {
         for (i = 0; i < strlen(tmp->name); i++)
@@ -55,7 +57,8 @@ void *c_handler(void *client_t)
     // char password[31] = {};
     char recv_msg[101] = {};
     char send_msg[201] = {};
-    int leave_flag = 0, data;
+    int leave_flag = 0, data, command_flag = 0;
+
     // char opt[4]; // check the option
 
     //login or register
@@ -100,6 +103,7 @@ void *c_handler(void *client_t)
             else if (strcmp(recv_msg, "/online") == 0)
             {
                 online(client);
+                command_flag = 1;
             }
             else
             sprintf(send_msg, "%s: %s", client->name, recv_msg);
@@ -117,7 +121,10 @@ void *c_handler(void *client_t)
         }
 
         printf("%s\n", recv_msg);
+        if (command_flag == 0)
         sendAll(client, send_msg);
+        else
+        command_flag = 0;
     }
 
     // if leaves, truncate the client from the list

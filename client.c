@@ -13,7 +13,7 @@
 
 // Global variables
 volatile sig_atomic_t flag = 0;
-int sockfd = 0; 
+int sockfd = 0;
 char name[31] = {};
 info *data;
 void catch_ctrl_c_and_exit(int sig)
@@ -61,16 +61,23 @@ void send_msg_handler()
                 break;
             }
         }
-        send(sockfd, message, 101, 0);
 
         if (strcmp(message, "/exit") == 0)
         {
             break;
         }
+        else if (strcmp(message, "/online") == 0)
+        {
+            send(sockfd, message, sizeof(message), 0);
+        }
         else if (message[0] == '/') // commands
         {
-            strcpy(data->message,message);
+            strcpy(data->message, message);
             command(data);
+        }
+        else
+        {
+            send(sockfd, message, 101, 0);
         }
     }
     catch_ctrl_c_and_exit(2);
@@ -131,9 +138,9 @@ int main()
     //storing info for data
     data = (info *)malloc(sizeof(info));
 
-    strcpy(data->name,name);
+    strcpy(data->name, name);
     data->sockfd = sockfd;
-    
+
     pthread_t send_msg_thread;
     if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, NULL) != 0)
     {

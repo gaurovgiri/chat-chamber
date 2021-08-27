@@ -40,11 +40,7 @@ void command(info *data) //commands are written here
     {
         printf("\r Developers' Name:\n\tGaurav Giri\n\tAnup Bhattarai\n\tKeshab Kamal\n\tAakash Budhathoki\n");
     }
-    else if (strcmp(message, "online") == 0)
-    {
-        strcpy(message,"/online");
-        send(data->sockfd,message,sizeof(message),0);
-    }
+    
     else
     {
         printf("\rUnknown Command. Use '/help' to show commands.\n");
