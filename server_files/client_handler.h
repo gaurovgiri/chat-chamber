@@ -2,6 +2,13 @@
 #define Client
 #include "list.h"
 
+struct user_data
+{
+    char username[31];
+    char password[31];
+    char role[10];
+} user_info;
+
 void sendAll(ClientList *, char *);
 
 void catch_ctrl_c_and_exit(int sig)
@@ -24,8 +31,9 @@ void catch_ctrl_c_and_exit(int sig)
 
 void makeAdmin(ClientList *client, char username[])
 {
+    FILE *fp = fopen("server_files/user_info.dat", "r+b");
     ClientList *tmp = (ClientList *)head->next;
-    int found = 0;
+    int found = 0, curr_pos;
     char msg[101];
     if (strcmp(client->name, username) == 0)
     {
@@ -62,6 +70,21 @@ void makeAdmin(ClientList *client, char username[])
                 send(tmp->socket, msg, sizeof(msg), 0);
                 sprintf(msg, "[%s has been made admin by %s!]", tmp->name, client->name);
                 sendAll(tmp, msg);
+                while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
+                {
+                    if (strcmp(user_info.username, tmp->name) == 0)
+                    {
+                        curr_pos = ftell(fp);
+                        fseek(fp,curr_pos-sizeof(user_info),SEEK_SET);
+                        strcpy(user_info.username,tmp->name);
+                        strcpy(user_info.password,user_info.password);
+                        strcpy(user_info.role,"admin");
+                        printf("%s %s %s",user_info.username,user_info.password,user_info.role);
+                        fwrite(&user_info,sizeof(user_info),1,fp);
+                        break;
+                    }
+                }
+                fclose(fp);
             }
         }
         else
@@ -75,6 +98,7 @@ void makeAdmin(ClientList *client, char username[])
         strcpy(msg, "[You donot have the permssion. Please ask admin for help!]");
         send(client->socket, msg, sizeof(msg), 0);
     }
+
 }
 
 void sendAll(ClientList *client, char *msg)
@@ -177,12 +201,6 @@ void *c_handler(void *client_t)
     int found = 0;
     FILE *fp;
 
-    struct user_data
-    {
-        char username[31];
-        char password[31];
-    } user_info;
-
     // char opt[4]; // check the option
 
     //login or register
@@ -209,16 +227,10 @@ void *c_handler(void *client_t)
             strcpy(send_msg, "[Your login was Successful.]");
             send(client->socket, send_msg, sizeof(send_msg), 0);
             strcpy(client->name, user);
+            strcpy(client->role, user_info.role);
             printf("%s->(%s)(%d) joined the chatroom\n", client->name, client->ip, client->socket);
             sprintf(send_msg, "[%s joined the chatroom]", client->name);
             sendAll(client, send_msg);
-            if (head->next == curr && strcmp(head->next->role, "admin") != 0)
-            {
-
-                strcpy(curr->role, "admin");
-                strcpy(send_msg, "[Sever made you the admin!!]");
-                send(curr->socket, send_msg, sizeof(send_msg), 0);
-            }
         }
         else
         {
@@ -231,7 +243,7 @@ void *c_handler(void *client_t)
 
     case 2: //register
         fp = fopen("server_files/user_info.dat", "rb");
-        while (fread(&user_info, sizeof(user_info), 1, fp))
+        while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
         {
             if ((strcmp(user_info.username, user) == 0))
             {
@@ -251,20 +263,15 @@ void *c_handler(void *client_t)
             fp = fopen("server_files/user_info.dat", "ab");
             strcpy(user_info.username, user);
             strcpy(user_info.password, pass);
-            strcpy(client->name, user);
+            strcpy(user_info.role, "member");
+            strcpy(client->name, user_info.username);
+            strcpy(client->role, user_info.role);
             fwrite(&user_info, sizeof(user_info), 1, fp);
             printf("%s->(%s)(%d) joined the chatroom FRESH\n", client->name, client->ip, client->socket);
             sprintf(send_msg, "[%s joined the chatroom FRESH]", client->name);
             sendAll(client, send_msg);
-            strcpy(send_msg,"[You are registered successfully!]");
-            send(client->socket,send_msg,sizeof(send_msg),0);
-            if (head->next == curr && strcmp(head->next->role, "admin") != 0)
-            {
-
-                strcpy(curr->role, "admin");
-                strcpy(send_msg, "[Sever made you the admin!!]");
-                send(curr->socket, send_msg, sizeof(send_msg), 0);
-            }
+            strcpy(send_msg, "[You are registered successfully!]");
+            send(client->socket, send_msg, sizeof(send_msg), 0);
         }
         fclose(fp);
         break;

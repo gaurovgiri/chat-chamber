@@ -91,6 +91,7 @@ int main()
 {
     signal(SIGINT, catch_ctrl_c_and_exit);
     short port;
+    int leave_flag = 0;
     
     //WSDATA Data
     //WSStartup(MAKEWORD(2,2),&DATA);
@@ -189,9 +190,10 @@ int main()
     default:
         printf("\nOut of Option");
         exit(EXIT_FAILURE);
+        leave_flag = 1;
         break;
     }
-
+    if (leave_flag == 0){
     send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0); //sent the info about login or registration
 
     //storing info for data
@@ -224,5 +226,6 @@ int main()
     }
 
     close(sockfd);
+    }
     return 0;
 }
