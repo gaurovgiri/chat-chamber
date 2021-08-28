@@ -95,7 +95,7 @@ int main()
     {
         str_trim_lf(name, 31);
     }
-    if (strlen(name) < 2 || strlen(name) >= 31 - 1)
+    if (strlen(name) < 2 || strlen(name) >= 30)
     {
         printf("\nName must be more than one and less than thirty characters.\n");
         exit(EXIT_FAILURE);

@@ -11,8 +11,6 @@
 #include "server_files/client_handler.h"
 #include <signal.h>
 
-
-
 void main()
 {
 
@@ -20,6 +18,7 @@ void main()
     int server_sockfd, server_addrlen, client_addrlen, client_sockfd;
     struct sockaddr_in server_addr, client_addr;
     ClientList *client;
+    char msg[101];
 
     server_addrlen = sizeof(server_addrlen);
     client_addrlen = sizeof(client_addrlen);
@@ -58,7 +57,13 @@ void main()
         client->prev = (ClientList *)curr;
         curr->next = client;
         curr = client;
+        if (head->next == curr && strcmp(head->next->role,"admin") != 0 )
+        {
 
+            strcpy(curr->role, "admin");
+            strcpy(msg,"Sever made you the admin!!");
+            send(curr->socket,msg,sizeof(msg),0);
+        }
 
         //assingning a thread to the client
         pthread_t t_id;
