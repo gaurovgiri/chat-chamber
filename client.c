@@ -15,7 +15,11 @@
 volatile sig_atomic_t flag = 0;
 int sockfd = 0;
 char name[31] = {};
+char password[20] = {};
+int opt;
+char loginOrRegister[101] = {};
 info *data;
+
 void catch_ctrl_c_and_exit(int sig)
 {
     flag = 1;
@@ -87,20 +91,11 @@ int main()
 {
     signal(SIGINT, catch_ctrl_c_and_exit);
     short port;
+    
     //WSDATA Data
     //WSStartup(MAKEWORD(2,2),&DATA);
 
-    // Naming
-    printf("Please enter your name: ");
-    if (fgets(name, 31, stdin) != NULL)
-    {
-        str_trim_lf(name, 31);
-    }
-    if (strlen(name) < 2 || strlen(name) >= 30)
-    {
-        printf("\nName must be more than one and less than thirty characters.\n");
-        exit(EXIT_FAILURE);
-    }
+    
 
     // Create socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -132,9 +127,72 @@ int main()
     getsockname(sockfd, (struct sockaddr *)&client_info, (socklen_t *)&c_addrlen);
     getpeername(sockfd, (struct sockaddr *)&server_info, (socklen_t *)&s_addrlen);
     printf("Connect to Server: %s:%d\n", inet_ntoa(server_info.sin_addr), ntohs(server_info.sin_port));
-    printf("You are: %s:%d\n", inet_ntoa(client_info.sin_addr), ntohs(client_info.sin_port));
+    printf("You are: %s:%d\n\n", inet_ntoa(client_info.sin_addr), ntohs(client_info.sin_port));
 
-    send(sockfd, name, 31, 0);
+    //Login or Register:
+    printf("Welcome To ChatChamber:\n1)Login\n2)Register\n");
+    printf("You: ");
+    scanf("%d", &opt);
+    switch (opt)
+    {
+    case 1:
+        printf("\tLogin\nUsername: ");
+        if (scanf("%s", name))
+        {
+            fflush(stdin);
+            str_trim_lf(name, 31);
+        }
+        if (strlen(name) < 2 || strlen(name) >= 30)
+        {
+            printf("\nName must be more than one and less than thirty characters.\n");
+            exit(EXIT_FAILURE);
+        }
+        printf("\nPassword: ");
+        if (scanf("%s", password))
+        {
+            fflush(stdin);
+            str_trim_lf(password, 20);
+        }
+        if (strlen(password) < 2 || strlen(password) >= 19)
+        {
+            printf("\nPassword must be more than one and less than twenty characters.\n");
+            exit(EXIT_FAILURE);
+        }
+        sprintf(loginOrRegister,"1 %s %s",name,password);
+        break;
+    case 2:
+         printf("\tRegister\nUsername: ");
+        if (scanf("%s", name))
+        {
+            fflush(stdin);
+            str_trim_lf(name, 31);
+        }
+        if (strlen(name) < 2 || strlen(name) >= 30)
+        {
+            printf("\nName must be more than one and less than thirty characters.\n");
+            exit(EXIT_FAILURE);
+        }
+        printf("\nPassword: ");
+        if (scanf("%s", password))
+        {
+            fflush(stdin);
+            str_trim_lf(password, 20);
+        }
+        if (strlen(password) < 2 || strlen(password) >= 19)
+        {
+            printf("\nPassword must be more than one and less than twenty characters.\n");
+            exit(EXIT_FAILURE);
+        }
+        sprintf(loginOrRegister,"2 %s %s",name,password);
+        break;
+
+    default:
+        printf("\nOut of Option");
+        exit(EXIT_FAILURE);
+        break;
+    }
+
+    send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0); //sent the info about login or registration
 
     //storing info for data
     data = (info *)malloc(sizeof(info));

@@ -165,38 +165,108 @@ void *c_handler(void *client_t)
 {
     ClientList *client = (ClientList *)client_t;
     char chat_name[31] = {};
-    // char password[31] = {};
+    char password[20] = {};
     char recv_msg[101] = {};
     char send_msg[201] = {};
     int data, command_flag = 0;
-    char *user_name;
+    char *user, *pass, *user_name;
     char kicks[36];
     char admin[36];
+    char loginOrRegister[101];
+    char *logOrReg;
+    int found = 0;
+    FILE *fp;
+
+    struct user_data
+    {
+        char username[31];
+        char password[31];
+    } user_info;
 
     // char opt[4]; // check the option
 
     //login or register
-    // recv(client->socket,opt,sizeof(opt),0);
+    recv(client->socket, loginOrRegister, sizeof(loginOrRegister), 0);
+    logOrReg = strtok(loginOrRegister, " ");
+    user = strtok(NULL, " ");
+    pass = strtok(NULL, " ");
 
-    switch (2) //atoi(opt)
+    switch (atoi(logOrReg)) //atoi(opt)
     {
     case 1: //login
+        fp = fopen("server_files/user_info.dat", "rb");
 
+        while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
+        {
+            if ((strcmp(user_info.username, user) == 0) && (strcmp(user_info.password, pass) == 0))
+            {
+                found = 1;
+                break;
+            }
+        }
+        if (found)
+        {
+            strcpy(send_msg, "[Your login was Successful.]");
+            send(client->socket, send_msg, sizeof(send_msg), 0);
+            strcpy(client->name, user);
+            printf("%s->(%s)(%d) joined the chatroom\n", client->name, client->ip, client->socket);
+            sprintf(send_msg, "[%s joined the chatroom]", client->name);
+            sendAll(client, send_msg);
+            if (head->next == curr && strcmp(head->next->role, "admin") != 0)
+            {
+
+                strcpy(curr->role, "admin");
+                strcpy(send_msg, "[Sever made you the admin!!]");
+                send(curr->socket, send_msg, sizeof(send_msg), 0);
+            }
+        }
+        else
+        {
+            strcpy(send_msg, "[Either Username or Password didn't match!]");
+            send(client->socket, send_msg, sizeof(send_msg), 0);
+            client->leave_flag = 1;
+        }
+        fclose(fp);
         break;
 
     case 2: //register
-        if (recv(client->socket, chat_name, sizeof(chat_name), 0) <= 0 || strlen(chat_name) < 2 || strlen(chat_name) >= 30)
+        fp = fopen("server_files/user_info.dat", "rb");
+        while (fread(&user_info, sizeof(user_info), 1, fp))
         {
-            printf("%s didn't input a name.", client->ip);
+            if ((strcmp(user_info.username, user) == 0))
+            {
+                found = 1;
+                break;
+            }
+        }
+        if (found)
+        {
+            strcpy(send_msg, "[Username already exists!]");
+            send(client->socket, send_msg, sizeof(send_msg), 0);
             client->leave_flag = 1;
         }
         else
         {
-            strncpy(client->name, chat_name, sizeof(chat_name));
-            printf("%s->(%s)(%d) joined the chatroom\n", client->name, client->ip, client->socket);
-            sprintf(send_msg, "[%s joined the chatroom]", client->name);
+            fclose(fp);
+            fp = fopen("server_files/user_info.dat", "ab");
+            strcpy(user_info.username, user);
+            strcpy(user_info.password, pass);
+            strcpy(client->name, user);
+            fwrite(&user_info, sizeof(user_info), 1, fp);
+            printf("%s->(%s)(%d) joined the chatroom FRESH\n", client->name, client->ip, client->socket);
+            sprintf(send_msg, "[%s joined the chatroom FRESH]", client->name);
             sendAll(client, send_msg);
+            strcpy(send_msg,"[You are registered successfully!]");
+            send(client->socket,send_msg,sizeof(send_msg),0);
+            if (head->next == curr && strcmp(head->next->role, "admin") != 0)
+            {
+
+                strcpy(curr->role, "admin");
+                strcpy(send_msg, "[Sever made you the admin!!]");
+                send(curr->socket, send_msg, sizeof(send_msg), 0);
+            }
         }
+        fclose(fp);
         break;
 
     default:
@@ -274,7 +344,6 @@ void *c_handler(void *client_t)
 
     // if leaves, truncate the client from the list
 
-    shutdown(client->socket, SHUT_RDWR);
     close(client->socket);
     if (client == curr)
     {
