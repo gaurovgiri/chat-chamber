@@ -86,6 +86,7 @@ void send_msg_handler()
 int main()
 {
     signal(SIGINT, catch_ctrl_c_and_exit);
+    short port;
     //WSDATA Data
     //WSStartup(MAKEWORD(2,2),&DATA);
 

@@ -12,6 +12,13 @@ void command(info *data) //commands are written here
 {
 
     char *user_name;
+    char kick[36];
+    char admin[36];
+
+    strcpy(kick, data->message);
+    strcpy(admin, data->message);
+
+
     if (strcmp(data->message, "/help") == 0)
     {
         printf("Command List:\n");
@@ -47,11 +54,32 @@ void command(info *data) //commands are written here
     {
         send(data->sockfd, data->message, sizeof(data->message), 0);
     }
-    else if (strcmp(user_name = strtok(data->message, " "), "/kick") == 0)
+    else if (strcmp(user_name = strtok(admin, " "), "/admin") == 0)
     {
-        data->message[5] = ' ';
-        send(data->sockfd,data->message,sizeof(data->message),0);
+        user_name = strtok(NULL, " ");
+        if (user_name == NULL)
+        {
+            printf("\rPlease specify the user name. Syntax : /admin <username>\n");
+        }
+        else
+        {
+            send(data->sockfd, data->message, sizeof(data->message), 0);
+        }
     }
+    else if (strcmp(user_name = strtok(kick, " "), "/kick") == 0)
+    {
+        user_name = strtok(NULL, " ");
+        if (user_name == NULL)
+        {
+            printf("\rPlease specify the user name. Syntax : /kick <username>\n");
+        }
+        else
+        {
+            printf("%s",user_name);
+            send(data->sockfd, data->message, sizeof(data->message), 0);
+        }
+    }
+
     else
     {
         printf("\rUnknown Command. Use '/help' to show commands.\n");
