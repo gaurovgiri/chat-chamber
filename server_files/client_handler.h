@@ -75,12 +75,12 @@ void makeAdmin(ClientList *client, char username[])
                     if (strcmp(user_info.username, tmp->name) == 0)
                     {
                         curr_pos = ftell(fp);
-                        fseek(fp,curr_pos-sizeof(user_info),SEEK_SET);
-                        strcpy(user_info.username,tmp->name);
-                        strcpy(user_info.password,user_info.password);
-                        strcpy(user_info.role,"admin");
-                        printf("%s %s %s",user_info.username,user_info.password,user_info.role);
-                        fwrite(&user_info,sizeof(user_info),1,fp);
+                        fseek(fp, curr_pos - sizeof(user_info), SEEK_SET);
+                        strcpy(user_info.username, tmp->name);
+                        strcpy(user_info.password, user_info.password);
+                        strcpy(user_info.role, "admin");
+                        printf("%s %s %s", user_info.username, user_info.password, user_info.role);
+                        fwrite(&user_info, sizeof(user_info), 1, fp);
                         break;
                     }
                 }
@@ -98,7 +98,6 @@ void makeAdmin(ClientList *client, char username[])
         strcpy(msg, "[You donot have the permssion. Please ask admin for help!]");
         send(client->socket, msg, sizeof(msg), 0);
     }
-
 }
 
 void sendAll(ClientList *client, char *msg)
@@ -167,7 +166,7 @@ void kick(ClientList *client, char username[])
             else
                 tmp = tmp->next;
         }
-        if (found)
+        if (!found)
         {
             sprintf(msg, "[%s is not online!]", username);
             send(client->socket, msg, sizeof(msg), 0);
@@ -184,6 +183,33 @@ void kick(ClientList *client, char username[])
         send(client->socket, msg, sizeof(msg), 0);
     }
 }
+void whispered(ClientList *client, char username[], char msg[])
+{
+    ClientList *tmp = (ClientList *)head->next;
+    char whisper[201];
+    int found = 0;
+    if (strcmp(client->name, username) == 0)
+    {
+        strcpy(whisper,"You cannot whisper yourself!");
+        send(client->socket,whisper,sizeof(whisper),0);
+        return;
+    }
+    while (tmp != NULL)
+    {
+        if (strcmp(tmp->name, username) == 0)
+        {
+            sprintf(whisper, "|%s whispered you: %s|", client->name, msg);
+            send(tmp->socket, whisper, sizeof(whisper), 0);
+            found = 1;
+            break;
+        }
+    }
+    if (found == 0)
+    {
+        sprintf(whisper, "[%s is not online]", username);
+        send(client->socket, whisper, sizeof(whisper), 0);
+    }
+}
 
 void *c_handler(void *client_t)
 {
@@ -193,9 +219,10 @@ void *c_handler(void *client_t)
     char recv_msg[101] = {};
     char send_msg[201] = {};
     int data, command_flag = 0;
-    char *user, *pass, *user_name;
+    char *user, *pass, *user_name, *whisp;
     char kicks[36];
     char admin[36];
+    char whisper[36];
     char loginOrRegister[101];
     char *logOrReg;
     int found = 0;
@@ -293,6 +320,7 @@ void *c_handler(void *client_t)
         {
             strcpy(kicks, recv_msg);
             strcpy(admin, recv_msg);
+            strcpy(whisper, recv_msg);
 
             if (strlen(recv_msg) == 0)
                 continue;
@@ -323,6 +351,16 @@ void *c_handler(void *client_t)
                 {
                     user_name = strtok(NULL, " ");
                     makeAdmin(client, user_name);
+                }
+            }
+            else if (strcmp(user_name = strtok(whisper, " "), "/whisper") == 0)
+            {
+                command_flag = 1;
+                if (user_name != NULL)
+                {
+                    user_name = strtok(NULL, " ");
+                    whisp = strtok(NULL, "\n");
+                    whispered(client, user_name, whisp);
                 }
             }
             else

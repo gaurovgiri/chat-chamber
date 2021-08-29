@@ -16,7 +16,6 @@ volatile sig_atomic_t flag = 0;
 int sockfd = 0;
 char name[31] = {};
 char password[20] = {};
-int opt;
 char loginOrRegister[101] = {};
 info *data;
 
@@ -33,8 +32,19 @@ void recv_msg_handler()
         int receive = recv(sockfd, receiveMessage, 201, 0);
         if (receive > 0)
         {
-            printf("\r%s\n", receiveMessage);
-            str_overwrite_stdout();
+            if (strcmp(receiveMessage, "[Either Username or Password didn't match!]") == 0 || strcmp(receiveMessage, "[Username already exists!]") == 0 || strncmp(receiveMessage, "[You have been kicked by ", 25) == 0)
+            {
+
+                printf("\r%s\n", receiveMessage);
+                close(sockfd);
+                exit(EXIT_FAILURE);
+                break;
+            }
+            else
+            {
+                printf("\r%s\n", receiveMessage);
+                str_overwrite_stdout();
+            }
         }
         else if (receive == 0)
         {
@@ -91,12 +101,10 @@ int main()
 {
     signal(SIGINT, catch_ctrl_c_and_exit);
     short port;
-    int leave_flag = 0;
-    
+    int leave_flag = 0, success = 0;
+    char opt[5];
     //WSDATA Data
     //WSStartup(MAKEWORD(2,2),&DATA);
-
-    
 
     // Create socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -132,100 +140,113 @@ int main()
 
     //Login or Register:
     printf("Welcome To ChatChamber:\n1)Login\n2)Register\n");
-    printf("You: ");
-    scanf("%d", &opt);
-    switch (opt)
+
+    while (!success)
     {
-    case 1:
-        printf("\tLogin\nUsername: ");
-        if (scanf("%s", name))
+        fflush(stdin);
+        printf("You: ");
+        scanf("%s", opt);
+        switch (atoi(opt))
         {
-            fflush(stdin);
-            str_trim_lf(name, 31);
-        }
-        if (strlen(name) < 2 || strlen(name) >= 30)
-        {
-            printf("\nName must be more than one and less than thirty characters.\n");
-            exit(EXIT_FAILURE);
-        }
-        printf("\nPassword: ");
-        if (scanf("%s", password))
-        {
-            fflush(stdin);
-            str_trim_lf(password, 20);
-        }
-        if (strlen(password) < 2 || strlen(password) >= 19)
-        {
-            printf("\nPassword must be more than one and less than twenty characters.\n");
-            exit(EXIT_FAILURE);
-        }
-        sprintf(loginOrRegister,"1 %s %s",name,password);
-        break;
-    case 2:
-         printf("\tRegister\nUsername: ");
-        if (scanf("%s", name))
-        {
-            fflush(stdin);
-            str_trim_lf(name, 31);
-        }
-        if (strlen(name) < 2 || strlen(name) >= 30)
-        {
-            printf("\nName must be more than one and less than thirty characters.\n");
-            exit(EXIT_FAILURE);
-        }
-        printf("\nPassword: ");
-        if (scanf("%s", password))
-        {
-            fflush(stdin);
-            str_trim_lf(password, 20);
-        }
-        if (strlen(password) < 2 || strlen(password) >= 19)
-        {
-            printf("\nPassword must be more than one and less than twenty characters.\n");
-            exit(EXIT_FAILURE);
-        }
-        sprintf(loginOrRegister,"2 %s %s",name,password);
-        break;
-
-    default:
-        printf("\nOut of Option");
-        exit(EXIT_FAILURE);
-        leave_flag = 1;
-        break;
-    }
-    if (leave_flag == 0){
-    send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0); //sent the info about login or registration
-
-    //storing info for data
-    data = (info *)malloc(sizeof(info));
-
-    strcpy(data->name, name);
-    data->sockfd = sockfd;
-
-    pthread_t send_msg_thread;
-    if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, NULL) != 0)
-    {
-        printf("Create pthread error!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    pthread_t recv_msg_thread;
-    if (pthread_create(&recv_msg_thread, NULL, (void *)recv_msg_handler, NULL) != 0)
-    {
-        printf("Create pthread error!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    while (1)
-    {
-        if (flag)
-        {
-            printf("\nBye\n");
+        case 1:
+            printf("\tLogin\nUsername: ");
+            if (scanf("%s", name))
+            {
+                fflush(stdin);
+                str_trim_lf(name, 31);
+                success = 1;
+            }
+            if (strlen(name) < 2 || strlen(name) >= 30)
+            {
+                printf("\nName must be more than one and less than thirty characters.\n");
+                success = 0;
+                // exit(EXIT_FAILURE);
+            }
+            printf("Password: ");
+            if (scanf("%s", password))
+            {
+                fflush(stdin);
+                str_trim_lf(password, 20);
+                success = 1;
+            }
+            if (strlen(password) < 2 || strlen(password) >= 19)
+            {
+                printf("\nPassword must be more than one and less than twenty characters.\n");
+                success = 0;
+                // exit(EXIT_FAILURE);
+            }
+            sprintf(loginOrRegister, "1 %s %s", name, password);
+            break;
+        case 2:
+            printf("\tRegister\nUsername: ");
+            if (scanf("%s", name))
+            {
+                fflush(stdin);
+                str_trim_lf(name, 31);
+                success = 1;
+            }
+            if (strlen(name) < 2 || strlen(name) >= 30)
+            {
+                printf("\nName must be more than one and less than thirty characters.\n");
+                success = 0;
+                // exit(EXIT_FAILURE);
+            }
+            printf("\nPassword: ");
+            if (scanf("%s", password))
+            {
+                fflush(stdin);
+                str_trim_lf(password, 20);
+                success = 1;
+            }
+            if (strlen(password) < 2 || strlen(password) >= 19)
+            {
+                printf("\nPassword must be more than one and less than twenty characters.\n");
+                success = 0;
+                // exit(EXIT_FAILURE);
+            }
+            sprintf(loginOrRegister, "2 %s %s", name, password);
+            break;
+        default:
+            printf("\nOut of Option\n");
+            success = 0;
             break;
         }
     }
 
-    close(sockfd);
+    if (leave_flag == 0)
+    {
+        send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0); //sent the info about login or registration
+
+        //storing info for data
+        data = (info *)malloc(sizeof(info));
+
+        strcpy(data->name, name);
+        data->sockfd = sockfd;
+
+        pthread_t send_msg_thread;
+        if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, NULL) != 0)
+        {
+            printf("Create pthread error!\n");
+            exit(EXIT_FAILURE);
+        }
+
+        pthread_t recv_msg_thread;
+        if (pthread_create(&recv_msg_thread, NULL, (void *)recv_msg_handler, NULL) != 0)
+        {
+            printf("Create pthread error!\n");
+            exit(EXIT_FAILURE);
+        }
+
+        while (1)
+        {
+            if (flag)
+            {
+                printf("\nBye\n");
+                break;
+            }
+        }
     }
+    close(sockfd);
+
     return 0;
 }

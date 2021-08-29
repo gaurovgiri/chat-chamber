@@ -11,13 +11,14 @@ typedef struct DATA
 void command(info *data) //commands are written here
 {
 
-    char *user_name;
+    char *user_name,*whisp;
     char kick[36];
     char admin[36];
+    char whisper[201];
 
     strcpy(kick, data->message);
     strcpy(admin, data->message);
-
+    strcpy(whisper,data->message);
 
     if (strcmp(data->message, "/help") == 0)
     {
@@ -75,10 +76,24 @@ void command(info *data) //commands are written here
         }
         else
         {
-            printf("%s",user_name);
             send(data->sockfd, data->message, sizeof(data->message), 0);
         }
     }
+    else if (strcmp(user_name = strtok(whisper, " "), "/whisper") == 0) // fix the multi words whisper
+    {
+        user_name = strtok(NULL, " ");
+        whisp = strtok(NULL,"\0");
+        if (user_name == NULL || whisp == NULL)
+        {
+            printf("\rPlease specify the user name. Syntax : /whisper <username> <msg>\n");
+        }
+        else
+        {
+            
+            send(data->sockfd, data->message, sizeof(data->message), 0);
+        }
+    }
+
 
     else
     {
