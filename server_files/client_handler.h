@@ -1,6 +1,7 @@
 #ifndef Client
 #define Client
 #include "list.h"
+#include <string.h>
 
 struct user_data
 {
@@ -35,7 +36,7 @@ void makeAdmin(ClientList *client, char username[])
     ClientList *tmp = (ClientList *)head->next;
     int found = 0, curr_pos;
     char msg[101];
-    if (strcmp(client->name, username) == 0)
+    if (strcasecmp(client->name, username) == 0)
     {
 
         strcpy(msg, "[\033[0;33m You can't admin yourself!\033[0m]");
@@ -46,7 +47,7 @@ void makeAdmin(ClientList *client, char username[])
     {
         while (tmp != NULL)
         {
-            if (strcmp(tmp->name, username) == 0)
+            if (strcasecmp(tmp->name, username) == 0)
             {
                 found = 1;
                 break;
@@ -145,7 +146,7 @@ void kick(ClientList *client, char username[])
     char msg[201];
     int found = 0;
     ClientList *tmp = (ClientList *)head->next;
-    if (strcmp(client->name, username) == 0)
+    if (strcasecmp(client->name, username) == 0)
     {
         strcpy(msg, "[\033[0;33m You cannot kick yourself.\033[0m ]");
         send(client->socket, msg, sizeof(msg), 0);
@@ -156,7 +157,7 @@ void kick(ClientList *client, char username[])
         sprintf(msg, "[\033[0;31m You have been kicked by %s\033[0m]", client->name);
         while (tmp != NULL)
         {
-            if (strcmp(tmp->name, username) == 0)
+            if (strcasecmp(tmp->name, username) == 0)
             {
                 found = 1;
                 send(tmp->socket, msg, sizeof(msg), 0);
@@ -188,7 +189,7 @@ void whispered(ClientList *client, char username[], char msg[])
     ClientList *tmp = (ClientList *)head->next;
     char whisper[201];
     int found = 0;
-    if (strcmp(client->name, username) == 0)
+    if (strcasecmp(client->name, username) == 0)
     {
         strcpy(whisper, "You cannot whisper yourself!");
         send(client->socket, whisper, sizeof(whisper), 0);
@@ -196,7 +197,7 @@ void whispered(ClientList *client, char username[], char msg[])
     }
     while (tmp != NULL)
     {
-        if (strcmp(tmp->name, username) == 0)
+        if (strcasecmp(tmp->name, username) == 0)
         {
             sprintf(whisper, "|%s whispered you: %s|", client->name, msg);
             send(tmp->socket, whisper, sizeof(whisper), 0);
@@ -243,7 +244,8 @@ void *c_handler(void *client_t)
 
         while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
         {
-            if ((strcmp(user_info.username, user) == 0) && (strcmp(user_info.password, pass) == 0))
+            
+            if ((strcasecmp(user_info.username, user) == 0) && (strcmp(user_info.password, pass) == 0))
             {
                 found = 1;
                 break;
@@ -272,7 +274,7 @@ void *c_handler(void *client_t)
         fp = fopen("server_files/user_info.dat", "rb");
         while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
         {
-            if ((strcmp(user_info.username, user) == 0))
+            if ((strcasecmp(user_info.username, user) == 0))
             {
                 found = 1;
                 break;
