@@ -34,7 +34,7 @@ void command(info *data) //commands are written here
     }
     else if (strcmp(data->message, "/rickroll") == 0)
     {
-        sprintf(data->message, "\r %s RickRolled You: Never Gonna Give you Up.", data->name);
+        sprintf(data->message, "\r%s RickRolled You: Never Gonna Give you Up.", data->name);
         send(data->sockfd, data->message, sizeof(data->message), 0);
     }
     else if (strcmp(data->message, "/clear") == 0)

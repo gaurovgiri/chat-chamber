@@ -14,7 +14,7 @@ void sendAll(ClientList *, char *);
 void catch_ctrl_c_and_exit(int sig)
 {
     ClientList *tmp;
-    char alert[] = "[Server is Closed!]";
+    char alert[] = "[\033[0;31m Server is Closed!\033[0m]";
     while (head != NULL)
     {
         printf("\nClose socketfd: %d\n", head->socket);
@@ -38,7 +38,7 @@ void makeAdmin(ClientList *client, char username[])
     if (strcmp(client->name, username) == 0)
     {
 
-        strcpy(msg, "[You can't admin yourself!]");
+        strcpy(msg, "[\033[0;33m You can't admin yourself!\033[0m]");
         send(client->socket, msg, sizeof(msg), 0);
         return;
     }
@@ -60,15 +60,15 @@ void makeAdmin(ClientList *client, char username[])
         {
             if (strcmp(tmp->role, "admin") == 0)
             {
-                sprintf(msg, "[%s is already an admin!]", tmp->name);
+                sprintf(msg, "[\033[0;33m %s is already an admin!\033[0m ]", tmp->name);
                 send(client->socket, msg, sizeof(msg), 0);
             }
             else
             {
                 strcpy(tmp->role, "admin");
-                sprintf(msg, "[You have been made admin by %s!]", client->name);
+                sprintf(msg, "[\033[0;32m You have been made admin by %s!\033[0m]", client->name);
                 send(tmp->socket, msg, sizeof(msg), 0);
-                sprintf(msg, "[%s has been made admin by %s!]", tmp->name, client->name);
+                sprintf(msg, "[\033[0;36m %s has been made admin by %s!\033[0m]", tmp->name, client->name);
                 sendAll(tmp, msg);
                 while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
                 {
@@ -89,13 +89,13 @@ void makeAdmin(ClientList *client, char username[])
         }
         else
         {
-            sprintf(msg, "[%s is not online!]", username);
+            sprintf(msg, "[\033[0;33m %s is not online!\033[0m]", username);
             send(client->socket, msg, sizeof(msg), 0);
         }
     }
     else
     {
-        strcpy(msg, "[You donot have the permssion. Please ask admin for help!]");
+        strcpy(msg, "[\033[0;33mYou donot have the permssion. Please ask admin for help!\033[0m]");
         send(client->socket, msg, sizeof(msg), 0);
     }
 }
@@ -147,13 +147,13 @@ void kick(ClientList *client, char username[])
     ClientList *tmp = (ClientList *)head->next;
     if (strcmp(client->name, username) == 0)
     {
-        strcpy(msg, "[You cannot kick yourself.]");
+        strcpy(msg, "[\033[0;33m You cannot kick yourself.\033[0m ]");
         send(client->socket, msg, sizeof(msg), 0);
         return;
     }
     else if (strcmp(client->role, "admin") == 0)
     {
-        sprintf(msg, "[You have been kicked by %s]", client->name);
+        sprintf(msg, "[\033[0;31m You have been kicked by %s\033[0m]", client->name);
         while (tmp != NULL)
         {
             if (strcmp(tmp->name, username) == 0)
@@ -168,18 +168,18 @@ void kick(ClientList *client, char username[])
         }
         if (!found)
         {
-            sprintf(msg, "[%s is not online!]", username);
+            sprintf(msg, "[\033[0;33m%s is not online!\033[0m]", username);
             send(client->socket, msg, sizeof(msg), 0);
         }
         else
         {
-            sprintf(msg, "[%s have been kicked by %s]", username, client->name);
+            sprintf(msg, "[\033[0;36m%s have been kicked by %s\033[0m]", username, client->name);
             sendAll(tmp, msg);
         }
     }
     else
     {
-        strcpy(msg, "[You donot have the permission to kick out. Please ask admin.]");
+        strcpy(msg, "[\033[0;33mYou donot have the permission to kick out. Please ask admin.\033[0m]");
         send(client->socket, msg, sizeof(msg), 0);
     }
 }
@@ -190,8 +190,8 @@ void whispered(ClientList *client, char username[], char msg[])
     int found = 0;
     if (strcmp(client->name, username) == 0)
     {
-        strcpy(whisper,"You cannot whisper yourself!");
-        send(client->socket,whisper,sizeof(whisper),0);
+        strcpy(whisper, "You cannot whisper yourself!");
+        send(client->socket, whisper, sizeof(whisper), 0);
         return;
     }
     while (tmp != NULL)
@@ -251,17 +251,17 @@ void *c_handler(void *client_t)
         }
         if (found)
         {
-            strcpy(send_msg, "[Your login was Successful.]");
+            strcpy(send_msg, "\033[0;32m[Your login was Successful.\033[0m]");
             send(client->socket, send_msg, sizeof(send_msg), 0);
             strcpy(client->name, user);
             strcpy(client->role, user_info.role);
             printf("%s->(%s)(%d) joined the chatroom\n", client->name, client->ip, client->socket);
-            sprintf(send_msg, "[%s joined the chatroom]", client->name);
+            sprintf(send_msg, "[\033[0;35m %s joined the chatroom\033[0m]", client->name);
             sendAll(client, send_msg);
         }
         else
         {
-            strcpy(send_msg, "[Either Username or Password didn't match!]");
+            strcpy(send_msg, "[\033[0;31mEither Username or Password didn't match!\033[0m]");
             send(client->socket, send_msg, sizeof(send_msg), 0);
             client->leave_flag = 1;
         }
@@ -280,7 +280,7 @@ void *c_handler(void *client_t)
         }
         if (found)
         {
-            strcpy(send_msg, "[Username already exists!]");
+            strcpy(send_msg, "[\033[0;31mUsername already exists!\033[0m]");
             send(client->socket, send_msg, sizeof(send_msg), 0);
             client->leave_flag = 1;
         }
@@ -295,14 +295,16 @@ void *c_handler(void *client_t)
             strcpy(client->role, user_info.role);
             fwrite(&user_info, sizeof(user_info), 1, fp);
             printf("%s->(%s)(%d) joined the chatroom FRESH\n", client->name, client->ip, client->socket);
-            sprintf(send_msg, "[%s joined the chatroom FRESH]", client->name);
+            sprintf(send_msg, "[\033[0;35m %s joined the chatroom \033[0;32m|FRESH|\033[0m]", client->name);
             sendAll(client, send_msg);
-            strcpy(send_msg, "[You are registered successfully!]");
+            strcpy(send_msg, "[\033[0;32mYou are registered successfully!\033[0m]");
             send(client->socket, send_msg, sizeof(send_msg), 0);
         }
         fclose(fp);
         break;
-
+    case 3:
+        client->leave_flag = 1;
+        break;
     default:
         break;
     }
@@ -331,7 +333,7 @@ void *c_handler(void *client_t)
             }
             else if (strcmp(recv_msg, "/role") == 0)
             {
-                sprintf(send_msg, "[You are \"%s\"]", client->role);
+                sprintf(send_msg, "[\033[0;34mYou are \033[0;32m\"%s\"\033[0m]", client->role);
                 send(client->socket, send_msg, sizeof(send_msg), 0);
                 command_flag = 1;
             }
@@ -364,12 +366,12 @@ void *c_handler(void *client_t)
                 }
             }
             else
-                sprintf(send_msg, "%s: %s", client->name, recv_msg);
+                sprintf(send_msg, "\033[0m\033[41;1m%s:\033[0m\033[44;1m %s\033[0m", client->name, recv_msg);
         }
         else if (data == 0 || strcmp(recv_msg, "exit") == 0)
         {
             printf("%s->(%s)(%d) left the chatroom\n", client->name, client->ip, client->socket);
-            sprintf(send_msg, "[%s left the chatroom]", client->name);
+            sprintf(send_msg, "[\033[0;33m%s left the chatroom\033[0m]", client->name);
             sendAll(client, send_msg);
             client->leave_flag = 1;
         }
@@ -389,6 +391,9 @@ void *c_handler(void *client_t)
 
     // if leaves, truncate the client from the list
 
+    strcpy(send_msg,"Connection Closed!");
+    printf("\tConnection Closed with %s\n",client->ip);
+    send(client->socket,send_msg,sizeof(send_msg),0);
     close(client->socket);
     if (client == curr)
     {
@@ -399,13 +404,6 @@ void *c_handler(void *client_t)
     {
         client->prev->next = client->next;
         client->next->prev = client->prev;
-
-        if (head->next == curr && strcmp(curr->role, "member") == 0)
-        {
-            strcpy(curr->role, "admin");
-            strcpy(send_msg, "[Sever made you the admin!!]");
-            send(curr->socket, send_msg, sizeof(send_msg), 0);
-        }
     }
     free(client);
 }
