@@ -367,9 +367,16 @@ void *c_handler(void *client_t)
             else if (strcmp(recv_msg, "/rickroll") == 0)
             {
                 command_flag = 1;
-                // sprintf(send_msg,"\033[42;1m !!!%s RickRolled You: NEVER GONNA GIVE YOU UP! NEVER GONNA LET YOU DOWN!!! \033[0m",client->name);
-                sprintf(send_msg," !!!\033[0m\033[33;1m%s RickRolled You: \033[0m\033[42;1mNEVER GONNA GIVE YOU UP! NEVER GONNA LET YOU DOWN!!!\033[0m ",client->name);
-                sendAll(client,send_msg);
+                sprintf(send_msg, " !!!\033[0m\033[33;1m%s RickRolled You: \033[0m\033[42;1mNEVER GONNA GIVE YOU UP! NEVER GONNA LET YOU DOWN!!!\033[0m ", client->name);
+                sendAll(client, send_msg);
+            }
+            else if (strcmp(recv_msg, "/exit") == 0)
+            {
+                printf("%s->(%s)(%d) left the chatroom\n", client->name, client->ip, client->socket);
+                sprintf(send_msg, "[\033[0;33m%s left the chatroom\033[0m]", client->name);
+                sendAll(client, send_msg);
+                client->leave_flag = 1;
+                break;
             }
             else
                 sprintf(send_msg, "\033[0m\033[41;1m%s:\033[0m\033[44;1m %s\033[0m", client->name, recv_msg);
@@ -380,11 +387,12 @@ void *c_handler(void *client_t)
             sprintf(send_msg, "[\033[0;33m%s left the chatroom\033[0m]", client->name);
             sendAll(client, send_msg);
             client->leave_flag = 1;
+            continue;
         }
         else
         {
             printf("Something Occured Wrong!\n");
-            client->leave_flag = 1;
+            continue;
         }
         if (client->leave_flag == 0)
             printf("%s(%s): %s\n", client->name, client->ip, recv_msg);
