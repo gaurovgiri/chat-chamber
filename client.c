@@ -87,6 +87,8 @@ void send_msg_handler()
 
         if (strcmp(message, "/exit") == 0)
         {
+            send(sockfd, message, sizeof(message), 0);
+            getch();
             break;
         }
         else if (message[0] == '/') // commands
@@ -255,7 +257,7 @@ int main()
 
     if (leave_flag == 0)
     {
-        system("clear");  // win->cls()
+        system("clear");                                           // win->cls()
         send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0); //sent the info about login or registration
 
         //storing info for data
@@ -285,6 +287,8 @@ int main()
             if (flag)
             {
                 yellow();
+                strcpy(loginOrRegister, "/exit");
+                send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0);
                 printf("\nBye\n");
                 break;
             }
