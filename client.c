@@ -88,7 +88,6 @@ void send_msg_handler()
         if (strcmp(message, "/exit") == 0)
         {
             send(sockfd, message, sizeof(message), 0);
-            getch();
             break;
         }
         else if (message[0] == '/') // commands
