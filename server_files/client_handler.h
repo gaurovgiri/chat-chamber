@@ -325,58 +325,62 @@ void *c_handler(void *client_t)
 
             if (strlen(recv_msg) == 0)
                 continue;
-            else if (strcmp(recv_msg, "/online") == 0)
+            if (recv_msg[0] == '/')
             {
-                online(client);
-                command_flag = 1;
-            }
-            else if (strcmp(recv_msg, "/role") == 0)
-            {
-                sprintf(send_msg, "[\033[0;34mYou are \033[0;32m\"%s\"\033[0m]", client->role);
-                send(client->socket, send_msg, sizeof(send_msg), 0);
-                command_flag = 1;
-            }
-            else if (strcmp(user_name = strtok(kicks, " "), "/kick") == 0)
-            {
-                command_flag = 1;
-                if (user_name != NULL)
+
+                if (strcmp(recv_msg, "/online") == 0)
                 {
+                    online(client);
+                    command_flag = 1;
+                }
+                else if (strcmp(recv_msg, "/role") == 0)
+                {
+                    sprintf(send_msg, "[\033[0;34mYou are \033[0;32m\"%s\"\033[0m]", client->role);
+                    send(client->socket, send_msg, sizeof(send_msg), 0);
+                    command_flag = 1;
+                }
+                else if (strcmp(user_name = strtok(kicks, " "), "/kick") == 0)
+                {
+                    command_flag = 1;
+                    if (user_name != NULL)
+                    {
+                        user_name = strtok(NULL, " ");
+                        kick(client, user_name);
+                    }
+                }
+                else if (strcmp(user_name = strtok(admin, " "), "/admin") == 0)
+                {
+                    command_flag = 1;
+                    if (user_name != NULL)
+                    {
+                        user_name = strtok(NULL, " ");
+                        makeAdmin(client, user_name);
+                    }
+                }
+                else if (strcmp(user_name = strtok(whisper, " "), "/whisper") == 0)
+                {
+                    command_flag = 1;
                     user_name = strtok(NULL, " ");
-                    kick(client, user_name);
+                    if (user_name != NULL)
+                    {
+                        whisp = strtok(NULL, "\n");
+                        whispered(client, user_name, whisp);
+                    }
                 }
-            }
-            else if (strcmp(user_name = strtok(admin, " "), "/admin") == 0)
-            {
-                command_flag = 1;
-                if (user_name != NULL)
+                else if (strcmp(recv_msg, "/rickroll") == 0)
                 {
-                    user_name = strtok(NULL, " ");
-                    makeAdmin(client, user_name);
+                    command_flag = 1;
+                    sprintf(send_msg, " !!!\033[0m\033[33;1m%s RickRolled You: \033[0m\033[42;1mNEVER GONNA GIVE YOU UP! NEVER GONNA LET YOU DOWN!!!\033[0m ", client->name);
+                    sendAll(client, send_msg);
                 }
-            }
-            else if (strcmp(user_name = strtok(whisper, " "), "/whisper") == 0)
-            {
-                command_flag = 1;
-                user_name = strtok(NULL, " ");
-                if (user_name != NULL)
+                else if (strcmp(recv_msg, "/exit") == 0)
                 {
-                    whisp = strtok(NULL, "\n");
-                    whispered(client, user_name, whisp);
+                    printf("%s->(%s)(%d) left the chatroom\n", client->name, client->ip, client->socket);
+                    sprintf(send_msg, "[\033[0;33m%s left the chatroom\033[0m]", client->name);
+                    sendAll(client, send_msg);
+                    client->leave_flag = 1;
+                    break;
                 }
-            }
-            else if (strcmp(recv_msg, "/rickroll") == 0)
-            {
-                command_flag = 1;
-                sprintf(send_msg, " !!!\033[0m\033[33;1m%s RickRolled You: \033[0m\033[42;1mNEVER GONNA GIVE YOU UP! NEVER GONNA LET YOU DOWN!!!\033[0m ", client->name);
-                sendAll(client, send_msg);
-            }
-            else if (strcmp(recv_msg, "/exit") == 0)
-            {
-                printf("%s->(%s)(%d) left the chatroom\n", client->name, client->ip, client->socket);
-                sprintf(send_msg, "[\033[0;33m%s left the chatroom\033[0m]", client->name);
-                sendAll(client, send_msg);
-                client->leave_flag = 1;
-                break;
             }
             else
                 sprintf(send_msg, "\033[0m\033[41;1m%s:\033[0m\033[44;1m %s\033[0m", client->name, recv_msg);
