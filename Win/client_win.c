@@ -39,6 +39,7 @@ void recv_msg_handler()
 
                 printf("\r%s\n", receiveMessage);
                 close(sockfd);
+                getch();
                 exit(EXIT_FAILURE);
                 break;
             }
@@ -290,6 +291,7 @@ int main()
                 strcpy(loginOrRegister, "/exit");
                 send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0);
                 printf("\nBye\n");
+                getch();
                 break;
             }
         }
