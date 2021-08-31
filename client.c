@@ -255,7 +255,7 @@ int main()
 
     if (leave_flag == 0)
     {
-        system("clear");                                           // win->cls()
+        system("clear");  // win->cls()
         send(sockfd, loginOrRegister, sizeof(loginOrRegister), 0); //sent the info about login or registration
 
         //storing info for data
