@@ -13,7 +13,11 @@ For windows: use the 'client.exe' that is present inside the Win folder. If you 
 where client.exe is stored. The dynamic library is for the using the posix thread.
 
 
-For Linux: './client' to run the client and './server' to run the server
+For Linux: './client' to run the client and './server' to run the server and for compilation use gcc client.c -o client -lpthread
+
+
+
+
 
 It is opensource, anyone can clone and edit as per their way.
 
