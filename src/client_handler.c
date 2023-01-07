@@ -1,16 +1,4 @@
-#ifndef Client
-#define Client
-#include "list.h"
-#include <string.h>
-
-struct user_data
-{
-    char username[31];
-    char password[31];
-    char role[10];
-} user_info;
-
-void sendAll(ClientList *, char *);
+#include "../includes/client_handler.h"
 
 void catch_ctrl_c_and_exit(int sig)
 {
@@ -29,7 +17,6 @@ void catch_ctrl_c_and_exit(int sig)
     printf("Bye\n");
     exit(EXIT_SUCCESS);
 }
-
 void makeAdmin(ClientList *client, char username[])
 {
     FILE *fp = fopen("server_files/user_info.dat", "r+b");
@@ -425,5 +412,3 @@ void *c_handler(void *client_t)
     }
     free(client);
 }
-
-#endif

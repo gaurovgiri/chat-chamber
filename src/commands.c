@@ -1,12 +1,4 @@
-#ifndef COMMAND
-#define COMMAND
-
-typedef struct DATA
-{
-    char name[31];
-    int sockfd;
-    char message[101];
-} info;
+#include "../includes/commands.h"
 
 void command(info *data) //commands are written here
 {
@@ -105,5 +97,3 @@ void command(info *data) //commands are written here
         printf("\rUnknown Command. Use '/help' to show commands.\n");
     }
 }
-
-#endif
