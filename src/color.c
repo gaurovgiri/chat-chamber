@@ -1,6 +1,4 @@
-#ifndef COLOR
-#define COLOR
-
+#include "../includes/color.h"
 void red()
 {
     printf("\033[0;31m");
@@ -40,4 +38,3 @@ void reset()
 {
     printf("\033[0m");
 }
-#endif //COLOR

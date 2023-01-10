@@ -1,6 +1,4 @@
-#ifndef STRING
-#define STRING
-
+#include "../includes/str.h"
 void str_trim_lf(char *arr, int length)
 {
     int i;
@@ -21,5 +19,3 @@ void str_overwrite_stdout()
 
     fflush(stdout);
 }
-
-#endif // STRING
