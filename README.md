@@ -11,7 +11,7 @@ For Linux: './client' to run the client and './server' to run the server and for
 
 ## Screenshot:
 
-![screenshot](https://github.com/gaurovgiri/chatchamber/blob/gaurav/screenshot.png?raw=true)
+![screenshot](https://github.com/gaurovgiri/chatchamber/blob/master/screenshot.png?raw=true)
 
 
 
