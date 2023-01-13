@@ -36,8 +36,8 @@ int connectToServer(char server_ip[], short server_port)
     tv.tv_sec = 5;
     tv.tv_usec = 0;
 
-    sockfd = socket(AF_INET,SOCK_STREAM,0); 
-    setsockopt(sockfd,SOL_SOCKET,SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval));
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(struct timeval));
     int s_addrlen = sizeof(server_info);
     int c_addrlen = sizeof(client_info);
     int err;
@@ -52,7 +52,6 @@ int connectToServer(char server_ip[], short server_port)
 
     if (err == -1)
     {
-
         return EXIT_0;
     }
 
@@ -60,4 +59,14 @@ int connectToServer(char server_ip[], short server_port)
     getpeername(sockfd, (struct sockaddr *)&server_info, (socklen_t *)&s_addrlen);
 
     return SUCCESS_0;
+}
+
+char *getServerIP()
+{
+    return inet_ntoa(server_info.sin_addr);
+}
+
+uint16_t getServerPort()
+{
+    return ntohs(server_info.sin_port);
 }

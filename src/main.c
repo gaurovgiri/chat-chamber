@@ -16,6 +16,7 @@ int main(int argc, char const *argv[])
 
     char ip[17];
     short port;
+
     if (argc <= 1)
     {
         serverPrompt(ip, &port);
@@ -30,21 +31,11 @@ int main(int argc, char const *argv[])
         strncpy(ip, argv[1], sizeof(ip));
         port = (short)atoi(argv[2]);
     }
-    int connectionStatus = connectToServer(ip, port);
     refresh();
-    char msg[50];
-    if (connectionStatus == SUCCESS_0)
-    {
-        snprintf(msg, sizeof(msg), "Successfully Connected to %s:%d", inet_ntoa(server_info.sin_addr), ntohs(server_info.sin_port));
-        popup(msg, SUCCESS_POPUP);
-    }
-    else if (connectionStatus == EXIT_0)
-    {
+    connectionStatus(connectToServer(ip,port));
 
-        snprintf(msg, sizeof(msg), "Couldn't Connected to %s:%d", inet_ntoa(server_info.sin_addr), ntohs(server_info.sin_port));
-        popup(msg, ERROR_POPUP);
-    }
-
+    
+    
     endwin();
     return 0;
 }

@@ -9,8 +9,9 @@ extern int sockfd;
 extern struct sockaddr_in server_info, client_info;
 
 void catch_ctrl_c_and_exit(int);
-void serverPrompt(char [],short *);
+void serverPrompt(char[], short *);
 void cleanup();
 int connectToServer(char[], short);
-
+char *getServerIP();
+uint16_t getServerPort();
 #endif //__CLIENT__

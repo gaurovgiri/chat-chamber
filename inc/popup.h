@@ -10,7 +10,7 @@
 
 
 void popup(const char *, int);
-
+void connectionStatus(int);
 
 
 
