@@ -1,0 +1,3 @@
+- [ ] fix when connecting to 142.250.193.174 88
+- [ ] create chatting interface
+- [ ] 
