@@ -37,7 +37,6 @@ int connectToServer(char server_ip[], short server_port)
     tv.tv_usec = 0;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(struct timeval));
     int s_addrlen = sizeof(server_info);
     int c_addrlen = sizeof(client_info);
     int err;
@@ -49,7 +48,7 @@ int connectToServer(char server_ip[], short server_port)
     server_info.sin_port = htons(server_port);
 
     err = connect(sockfd, (struct sockaddr *)&server_info, s_addrlen);
-
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(struct timeval));
     if (err == -1)
     {
         return EXIT_0;

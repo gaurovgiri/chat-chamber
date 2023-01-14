@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include "client.h"
 #include "popup.h"
-
+#include "ui.h"
 
 
 int main(int argc, char const *argv[])
@@ -33,7 +33,8 @@ int main(int argc, char const *argv[])
     }
     refresh();
     connectionStatus(connectToServer(ip,port));
-
+    refresh();
+    loginOrReg();
     
     
     endwin();

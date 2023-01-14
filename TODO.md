@@ -1,5 +1,5 @@
-- [ ] fix when connecting to 142.250.193.174 88
-- [ ] Login or Register
+- [X] fix when connecting to 142.250.193.174 88
+- [X] Login or Register
 - [ ] /loadmsg
 - [ ] /unread 
 - [ ] create chatting interface
