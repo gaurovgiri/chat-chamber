@@ -2,17 +2,21 @@
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <arpa/inet.h>
 #include "client.h"
 #include "popup.h"
 #include "ui.h"
-
+#include "chat.h"
 
 int main(int argc, char const *argv[])
 {
+    int yMax, xMax;
+    int connected;
     signal(SIGINT, catch_ctrl_c_and_exit);
     initscr();
     atexit(cleanup);
+    getmaxyx(stdscr, yMax, xMax);
 
     char ip[17];
     short port;
@@ -32,10 +36,39 @@ int main(int argc, char const *argv[])
         port = (short)atoi(argv[2]);
     }
     refresh();
-    connectionStatus(connectToServer(ip,port));
-    refresh();
-    loginOrReg();
+    connectionStatus(connected = connectToServer(ip, port));
     
+
+
+    if (connected == SUCCESS_0)
+        loginOrReg();
+    else
+        exit(EXIT_0);
+
+    if (!leaveFlag)
+    {
+        pthread_t send_msg_thread;
+        if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, NULL) != 0)
+        {
+            popup("Create pthread error", EXIT_0);
+            exit(EXIT_FAILURE);
+        }
+
+        pthread_t recv_msg_thread;
+        if (pthread_create(&recv_msg_thread, NULL, (void *)recv_msg_handler, NULL) != 0)
+        {
+            popup("Create pthread error", EXIT_0);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    while (true)
+    {
+        if (leaveFlag)
+        {
+            exit(EXIT_SUCCESS);
+        }
+    }
     
     endwin();
     return 0;

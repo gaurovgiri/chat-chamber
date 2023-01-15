@@ -5,10 +5,11 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "client.h"
 #include "popup.h"
 
-int sockfd;
+int sockfd, leaveFlag=0;
 struct sockaddr_in server_info, client_info;
 
 void catch_ctrl_c_and_exit(int sig)
@@ -18,6 +19,8 @@ void catch_ctrl_c_and_exit(int sig)
 
 void cleanup()
 {
+    leaveFlag = 1;
+    close(sockfd);
     endwin();
 }
 

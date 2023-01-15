@@ -6,31 +6,33 @@
 
 int menu(char *options[], int option_len)
 {
-    keypad(stdscr, TRUE);
+    WINDOW *menuWin = newwin(stdscr->_maxy, stdscr->_maxx, 0, 0);
+    keypad(menuWin, TRUE);
     curs_set(0);
     int index = 0;
     int ch;
 
     while (true)
     {
-        clear();
+        wclear(menuWin);
         for (int i = 0; i < option_len; i++)
         {
             if (i == index)
             {
-                attron(A_REVERSE);
-                printw("%d. %s\n", i + 1, options[i]);
-                attroff(A_REVERSE);
+                wattron(menuWin, A_REVERSE);
+
+                wprintw(menuWin, "%d. %s\n", i + 1, options[i]);
+                wattroff(menuWin, A_REVERSE);
             }
             else
             {
-                printw("%d. %s\n", i + 1, options[i]);
+                wprintw(menuWin, "%d. %s\n", i + 1, options[i]);
             }
         }
 
-        refresh();
+        wrefresh(menuWin);
 
-        ch = getch();
+        ch = wgetch(menuWin);
 
         switch (ch)
         {
@@ -55,7 +57,8 @@ int menu(char *options[], int option_len)
         }
     }
 END:
-    keypad(stdscr, false);
+    keypad(menuWin, false);
+    deleteWin(menuWin);
     return index;
 }
 
@@ -79,7 +82,7 @@ void loginOrReg()
         break;
     }
 
-    exit(0);
+    return;
 }
 
 void loginPage()
@@ -132,8 +135,7 @@ void loginPage()
         }
     }
     curs_set(0);
-    delwin(loginBox);
-    getch();
+    deleteWin(loginBox);
 }
 
 void registerPage()
@@ -149,6 +151,8 @@ void registerPage()
     char username[20], password[20], confirm[20];
     mvwgetstr(regBox, 1, 18, code);
 
+// TODO: send user's invitation code to server and check for match in server and if correct send a response back and evaluate the response
+
     if (strcmp(code, "correct_code") == 0)
     {
         mvwprintw(regBox, 3, 1, "Username: ");
@@ -157,12 +161,12 @@ void registerPage()
         wrefresh(regBox);
 
         // username
-        strncpy(username,"",sizeof(username));
+        strncpy(username, "", sizeof(username));
         mvwgetstr(regBox, 3, 11, username);
 
         // password
-        strncpy(password,"",sizeof(password));
-        strncpy(confirm,"",sizeof(confirm));
+        strncpy(password, "", sizeof(password));
+        strncpy(confirm, "", sizeof(confirm));
         noecho();
         int i = 0;
         while (true)
@@ -220,6 +224,7 @@ void registerPage()
                 wrefresh(regBox);
             }
         }
+
         if (strcmp(password, confirm) == 0)
         {
             popup("Registered Successfully", 1);
@@ -238,5 +243,41 @@ void registerPage()
         loginOrReg();
     }
     curs_set(0);
-    delwin(regBox);
+    deleteWin(regBox);
+}
+
+WINDOW *createMessageBox()
+{
+
+    int yMax, xMax;
+    getmaxyx(stdscr, yMax, xMax);                  // Get the maximum screen dimensions
+    WINDOW *messageWin = newwin(20, 60, 3, 3);     // Create a new window for the messages
+    scrollok(messageWin, TRUE);                    // Allow scrolling in the messages window
+    wprintw(messageWin, "Welcome to the chat!\n"); // Print a welcome message
+    wrefresh(messageWin);                          // Refresh the messages window
+    return messageWin;
+}
+
+WINDOW *createInputBox()
+{
+    int yMax, xMax;
+    getmaxyx(stdscr, yMax, xMax);
+    WINDOW *inputWin = newwin(3, xMax, yMax - 3, 0);
+    box(inputWin, 0, 0);
+    wrefresh(inputWin);
+    return inputWin;
+}
+
+void displayOn(WINDOW *screen, char *msg)
+{
+    wprintw(screen, "%s\n", msg);
+    wrefresh(screen);
+}
+
+void deleteWin(WINDOW *screen)
+{
+    werase(screen);
+    wrefresh(screen);
+    delwin(screen);
+    refresh();
 }

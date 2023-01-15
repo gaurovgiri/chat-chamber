@@ -21,6 +21,10 @@ obj/%.o: src/%.c
 obj/main.o: src/main.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
 
+test:
+	$(CC) $(CFLAG) -o test $(LIBS)
+
+
 .PHONY: clean
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE)
