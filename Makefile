@@ -22,9 +22,9 @@ obj/main.o: src/main.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
 
 test:
-	$(CC) $(CFLAG) -o test $(LIBS)
+	gcc -I inc test.c -o test -lncurses && ./test
 
 
 .PHONY: clean
 clean:
-	rm -f $(OBJECTS) $(EXECUTABLE)
+	rm -f $(OBJECTS) $(EXECUTABLE) test
