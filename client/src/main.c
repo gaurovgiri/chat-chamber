@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <arpa/inet.h>
 #include "client.h"
 #include "popup.h"
 #include "ui.h"
@@ -11,12 +10,12 @@
 
 int main(int argc, char const *argv[])
 {
-    int yMax, xMax;
+    // int yMax, xMax;
     int connected;
     signal(SIGINT, catch_ctrl_c_and_exit);
     initscr();
     atexit(cleanup);
-    getmaxyx(stdscr, yMax, xMax);
+    // getmaxyx(stdscr, yMax, xMax);
 
     char ip[17];
     short port;
@@ -44,6 +43,8 @@ int main(int argc, char const *argv[])
         loginOrReg();
     else
         exit(EXIT_0);
+
+    popup("Welcome to Chat",SUCCESS_0);
 
     if (!leaveFlag)
     {

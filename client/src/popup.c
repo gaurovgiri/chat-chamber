@@ -3,6 +3,7 @@
 #include "client.h"
 #include "utils.h"
 #include <malloc.h>
+#include "ui.h"
 
 void popup(const char *msg, int code)
 {
@@ -17,8 +18,9 @@ void popup(const char *msg, int code)
     mvwprintw(popup_win, 3, (cols - 4 - strlen(status_code)) / 2, status_code);
     mvwprintw(popup_win,4,(cols-4-strlen("Press any key to continue."))/2,"Press any key to continue.");
     wrefresh(popup_win);
-    getch();
-    delwin(popup_win);
+    noecho();
+    wgetch(popup_win);
+    deleteWin(popup_win);
     refresh();
 }
 

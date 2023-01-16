@@ -151,7 +151,7 @@ void registerPage()
     char username[20], password[20], confirm[20];
     mvwgetstr(regBox, 1, 18, code);
 
-// TODO: send user's invitation code to server and check for match in server and if correct send a response back and evaluate the response
+    // TODO: send user's invitation code to server and check for match in server and if correct send a response back and evaluate the response
 
     if (strcmp(code, "correct_code") == 0)
     {
@@ -249,20 +249,19 @@ void registerPage()
 WINDOW *createMessageBox()
 {
 
-    int yMax, xMax;
-    getmaxyx(stdscr, yMax, xMax);                  // Get the maximum screen dimensions
-    WINDOW *messageWin = newwin(20, 60, 3, 3);     // Create a new window for the messages
-    scrollok(messageWin, TRUE);                    // Allow scrolling in the messages window
-    wprintw(messageWin, "Welcome to the chat!\n"); // Print a welcome message
-    wrefresh(messageWin);                          // Refresh the messages window
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);                      // Get the maximum screen dimensions
+    WINDOW *messageWin = newwin(rows - 5, cols, 0, 0); // Create a new window for the messages
+    scrollok(messageWin, TRUE);                        // Allow scrolling in the messages window
+    wrefresh(messageWin);                              // Refresh the messages window
     return messageWin;
 }
 
 WINDOW *createInputBox()
 {
-    int yMax, xMax;
-    getmaxyx(stdscr, yMax, xMax);
-    WINDOW *inputWin = newwin(3, xMax, yMax - 3, 0);
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    WINDOW *inputWin = newwin(3, cols, rows - 4, 0);
     box(inputWin, 0, 0);
     wrefresh(inputWin);
     return inputWin;
@@ -280,4 +279,22 @@ void deleteWin(WINDOW *screen)
     wrefresh(screen);
     delwin(screen);
     refresh();
+}
+
+void resizeMsg(WINDOW *screen)
+{
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    wresize(screen, rows - 5, cols);
+    mvwin(screen, 0, 0);
+    wrefresh(screen);
+}
+
+void resizeInp(WINDOW *screen)
+{
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    wresize(screen, 3, cols);
+    mvwin(screen, rows - 4, 0);
+    wrefresh(screen);
 }
