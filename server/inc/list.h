@@ -8,9 +8,8 @@ typedef struct Nodes
     struct Nodes *next;
     struct Nodes *prev;
     char ip[16];
-    char name[31];
-    char role[10];
     int leave_flag;
+    int authenticated;
 } ClientList;
 
 extern ClientList *head, *curr;

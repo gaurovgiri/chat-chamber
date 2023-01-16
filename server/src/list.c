@@ -11,8 +11,7 @@ ClientList *addNode(int sockfd, char *ip)
     client->next = NULL;
     client->prev = NULL;
     client->leave_flag = 0;
-    strncpy(client->role,"member",10);
+    client->authenticated = 0;
     strncpy(client->ip,ip,16);
-    strncpy(client->name,"NULL",5);
     return client;
 }
