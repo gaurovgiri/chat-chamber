@@ -14,4 +14,11 @@ void cleanup();
 int connectToServer(char[], short);
 char *getServerIP();
 uint16_t getServerPort();
+
+typedef struct
+{
+    char username[20];
+    char password[20];
+}CLIENT;
+
 #endif //__CLIENT__

@@ -5,7 +5,9 @@
 #include <string.h>
 #include <sys/socket.h>
 
+
 WINDOW *messageWin;
+
 void recv_msg_handler()
 {
     char receivedMessage[101];
@@ -22,16 +24,15 @@ void recv_msg_handler()
             displayOn(messageWin, receivedMessage);
         }
     }
-    delwin(messageWin);
+    deleteWin(messageWin);
 }
 
 void send_msg_handler()
 {
     char sendMessage[101];
     WINDOW *inputWin = createInputBox();
-    keypad(inputWin,TRUE);
+    wrefresh(inputWin);
     int i,ch;
-    // WINDOW *messageWin = createMessageBox();
     noecho();
     curs_set(1);
     while (1)
@@ -61,6 +62,8 @@ void send_msg_handler()
             {
                 resizeMsg(messageWin);
                 resizeInp(inputWin);
+                wrefresh(messageWin);
+                wrefresh(inputWin);
             }
             else
             {
@@ -84,7 +87,6 @@ void send_msg_handler()
             send(sockfd, sendMessage, sizeof(sendMessage), 0);
         }
     }
-    keypad(inputWin,FALSE);
-    delwin(inputWin);
+    deleteWin(inputWin);
     noecho();
 }

@@ -10,12 +10,12 @@
 
 int main(int argc, char const *argv[])
 {
-    // int yMax, xMax;
+
     int connected;
     signal(SIGINT, catch_ctrl_c_and_exit);
     initscr();
     atexit(cleanup);
-    // getmaxyx(stdscr, yMax, xMax);
+
 
     char ip[17];
     short port;
@@ -36,18 +36,17 @@ int main(int argc, char const *argv[])
     }
     refresh();
     connectionStatus(connected = connectToServer(ip, port));
-    
-
 
     if (connected == SUCCESS_0)
         loginOrReg();
     else
         exit(EXIT_0);
 
-    popup("Welcome to Chat",SUCCESS_0);
+
 
     if (!leaveFlag)
     {
+        popup("Welcome to Chat", SUCCESS_0);
         pthread_t send_msg_thread;
         if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, NULL) != 0)
         {
@@ -70,7 +69,7 @@ int main(int argc, char const *argv[])
             exit(EXIT_SUCCESS);
         }
     }
-    
+
     endwin();
     return 0;
 }

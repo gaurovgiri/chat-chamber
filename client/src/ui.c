@@ -3,7 +3,9 @@
 #include <string.h>
 #include <ncurses.h>
 #include <stdlib.h>
+#include "client.h"
 
+int authenticated = 0, error = 0;
 int menu(char *options[], int option_len)
 {
     WINDOW *menuWin = newwin(stdscr->_maxy, stdscr->_maxx, 0, 0);
@@ -65,28 +67,35 @@ END:
 void loginOrReg()
 {
     char *options[3] = {"Login", "Register", "Exit"};
-    int choice = menu(options, 3);
+    int choice;
 
-    switch (choice)
+    do
     {
-    case 0:
-        loginPage();
-        break;
-    case 1:
-        registerPage();
-        break;
-    case 2:
-        exit(0);
-        break;
-    default:
-        break;
-    }
+        choice = menu(options, 3);
+
+        send(sockfd, &choice, sizeof(int), 0); // 1
+        switch (choice)
+        {
+        case LOGIN:
+            loginPage();
+            break;
+        case REGISTER:
+            registerPage();
+            break;
+        case _EXIT:
+            exit(0);
+        default:
+            break;
+        }
+
+    } while (!authenticated);
 
     return;
 }
 
 void loginPage()
 {
+
     clear();
     int rows, cols;
     getmaxyx(stdscr, rows, cols);
@@ -134,6 +143,17 @@ void loginPage()
             wrefresh(loginBox);
         }
     }
+
+    CLIENT info;
+    strcpy(info.username, username);
+    strcpy(info.password, password);
+    send(sockfd, &info, sizeof(CLIENT), 0);
+
+    recv(sockfd, &authenticated, sizeof(int), 0);
+    if (!authenticated)
+    {
+        popup("Authentication Failed!", -1);
+    }
     curs_set(0);
     deleteWin(loginBox);
 }
@@ -142,18 +162,28 @@ void registerPage()
 {
 
     WINDOW *regBox = newwin(10, 40, 5, 5);
+    char code[20];
+    char username[20], password[20], confirm[20];
+    error = 0;
+
+    memset(username, 0, sizeof(username));
+    memset(password, 0, sizeof(password));
+    memset(confirm, 0, sizeof(confirm));
+    memset(code, 0, sizeof(code));
+
     box(regBox, 0, 0);
     curs_set(1);
     mvwprintw(regBox, 1, 1, "Invitation Code: ");
     wrefresh(regBox);
 
-    char code[20];
-    char username[20], password[20], confirm[20];
+    echo();
+
     mvwgetstr(regBox, 1, 18, code);
+    send(sockfd, code, sizeof(code), 0);
+    int validCode;
+    recv(sockfd, &validCode, sizeof(int), 0);
 
-    // TODO: send user's invitation code to server and check for match in server and if correct send a response back and evaluate the response
-
-    if (strcmp(code, "correct_code") == 0)
+    if (validCode)
     {
         mvwprintw(regBox, 3, 1, "Username: ");
         mvwprintw(regBox, 4, 1, "Password: ");
@@ -225,22 +255,39 @@ void registerPage()
             }
         }
 
-        if (strcmp(password, confirm) == 0)
+        if (strcmp(password, confirm) != 0)
         {
-            popup("Registered Successfully", 1);
-        }
-        else
-        {
+            error = 1;
             popup("Password didn't match", 2);
-            delwin(regBox);
-            loginOrReg();
         }
     }
     else
     {
+        error = 1;
         popup("Bad Invitation Code", -1);
-        delwin(regBox);
-        loginOrReg();
+        return;
+    }
+    send(sockfd, &error, sizeof(int), 0);
+    if (error)
+    {
+        error = 0;
+    }
+    else
+    {
+        CLIENT info;
+        int userExist;
+        strcpy(info.username, username);
+        strcpy(info.password, password);
+        send(sockfd, &info, sizeof(CLIENT), 0);
+        recv(sockfd, &userExist, sizeof(int), 0);
+        if (userExist)
+        {
+            popup("Username already exists!", -1);
+        }
+        else
+        {
+            authenticated = !userExist;
+        }
     }
     curs_set(0);
     deleteWin(regBox);
