@@ -3,20 +3,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <stdio.h>
-
-User *user;
-
-void sendAll(ClientList *client, char *msg)
-{
-    ClientList *tmp = (ClientList *)head->next;
-    while (tmp != NULL)
-    {
-
-        printf("Send to socket %d: \"%s\" \n", tmp->socket, msg);
-        send(tmp->socket, msg, 101, 0);
-        tmp = tmp->next;
-    }
-}
+#include <message.h>
 
 void *c_handler(void *client_t)
 {
@@ -29,20 +16,13 @@ void *c_handler(void *client_t)
         loginOrReg(client);
     } while (!client->authenticated);
 
-    char msg[101];
+    char message[101];
 
-    while (1)
+    while (!client->leave_flag)
     {
-        memset(msg, 0, sizeof(msg));
-        recv(client->socket, msg, sizeof(msg), 0);
-        if (strcmp(msg, "/exit") == 0)
-        {
-            break;
-        }
-        else
-        {
-            sendAll(client, msg);
-        }
+        memset(message, 0, sizeof(message));
+        recv(client->socket, message, sizeof(message), 0);
+        sendAll(client,message);
     }
     closeSocket(client);
 }
@@ -78,6 +58,11 @@ void authLogin(ClientList *client)
     int authenticated = dbAuth(info);
     client->authenticated = authenticated;
     send(client->socket, &authenticated, sizeof(int), 0);
+    if (client->authenticated)
+    {
+        dbGetUser(client, info.name);
+        printf("%s joined the chat\n",client->username);
+    }
 }
 
 void authRegister(ClientList *client)
@@ -89,6 +74,8 @@ void authRegister(ClientList *client)
     int validCode = dbValidate(invitationCode);
     send(client->socket, &validCode, sizeof(int), 0);
 
+    CLIENT info;
+
     int error = 0;
     if (!validCode)
         return;
@@ -96,15 +83,15 @@ void authRegister(ClientList *client)
     {
         recv(client->socket, &error, sizeof(int), 0);
         if (error)
-            client->authenticated = error = 0;
+            client->authenticated = 0;
         else
         {
-            CLIENT info;
             recv(client->socket, &info, sizeof(CLIENT), 0);
             int userExist = dbAuth(info);
             send(client->socket, &userExist, sizeof(int), 0);
             if (userExist)
             {
+                client->authenticated = 0;
                 return;
             }
             else
@@ -113,6 +100,10 @@ void authRegister(ClientList *client)
                 // dbStore;
             }
         }
+    }
+    if (client->authenticated)
+    {
+        dbGetUser(client, info.name);
     }
 }
 

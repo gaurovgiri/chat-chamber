@@ -21,7 +21,7 @@ void authRegister(ClientList *);
 
 
 
-typedef struct
+typedef struct _CLIENT
 {
     char name[20];
     char password[20];

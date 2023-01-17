@@ -24,6 +24,6 @@ int main(int argc, char const *argv[])
     {
         port = (short)atoi(argv[1]);
     }
-    startServer(port);
+    started = startServer(port);
     return 0;
 }

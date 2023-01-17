@@ -8,7 +8,7 @@
 #include "user.h"
 
 int dbAuth(CLIENT);
-void dbGetUser(User *);
+void dbGetUser(ClientList *, char *);
 int dbValidate(char *);
 
 #endif // __DB__
