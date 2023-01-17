@@ -5,19 +5,18 @@
 #include <string.h>
 #include <sys/socket.h>
 
-
 WINDOW *messageWin;
 
 void recv_msg_handler()
 {
-    char receivedMessage[101];
+    char receivedMessage[123];
     int recvStatus;
     messageWin = createMessageBox();
     while (1)
     {
         // curs_set(0);
         memset(receivedMessage, 0, sizeof(receivedMessage));
-        recvStatus = recv(sockfd, receivedMessage, 101, 0);
+        recvStatus = recv(sockfd, receivedMessage, sizeof(receivedMessage), 0);
 
         if (recvStatus > 0)
         {
@@ -32,7 +31,7 @@ void send_msg_handler()
     char sendMessage[101];
     WINDOW *inputWin = createInputBox();
     wrefresh(inputWin);
-    int i,ch;
+    int i, ch;
     noecho();
     curs_set(1);
     while (1)
@@ -68,24 +67,16 @@ void send_msg_handler()
             else
             {
                 sendMessage[i] = (char)ch;
-                mvwaddch(inputWin,1,1+i,(char)ch);
+                mvwaddch(inputWin, 1, 1 + i, (char)ch);
                 i++;
                 wrefresh(inputWin);
             }
         }
         werase(inputWin);
         wrefresh(inputWin);
-        if (strcmp(sendMessage, "/exit") == 0)
-        {
-            leaveFlag = 1;
-            send(sockfd, sendMessage, sizeof(sendMessage), 0);
-            break;
-        }
-        else
-        {
-            // displayOn(messageWin,sendMessage);
-            send(sockfd, sendMessage, sizeof(sendMessage), 0);
-        }
+
+        // displayOn(messageWin,sendMessage);
+        send(sockfd, sendMessage, sizeof(sendMessage), 0);
     }
     deleteWin(inputWin);
     noecho();
