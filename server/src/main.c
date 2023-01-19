@@ -2,7 +2,8 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <db.h>
+#include <string.h>
 
 int main(int argc, char const *argv[])
 {
@@ -24,6 +25,8 @@ int main(int argc, char const *argv[])
     {
         port = (short)atoi(argv[1]);
     }
+    
+    initDB();
     started = startServer(port);
     return 0;
 }

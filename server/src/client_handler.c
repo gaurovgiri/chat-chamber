@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <stdio.h>
 #include <message.h>
+#include "db.h"
 
 void *c_handler(void *client_t)
 {
@@ -12,7 +13,6 @@ void *c_handler(void *client_t)
 
     do
     {
-        client->authenticated = 0;
         loginOrReg(client);
     } while (!client->authenticated);
 
@@ -22,7 +22,7 @@ void *c_handler(void *client_t)
     {
         memset(&message, 0, sizeof(message));
         recv(client->socket, &message, sizeof(message), 0);
-        sendAll(client,message.msg);
+        sendAll(client, message.msg);
     }
     closeSocket(client);
 }
@@ -54,14 +54,15 @@ void loginOrReg(ClientList *client)
 void authLogin(ClientList *client)
 {
     CLIENT info;
+    memset(&info,0,sizeof(info));
     recv(client->socket, &info, sizeof(CLIENT), 0);
-    int authenticated = dbAuth(info);
-    client->authenticated = authenticated;
-    send(client->socket, &authenticated, sizeof(int), 0);
+    printf("%s %s\n",info.username,info.password);
+    client->authenticated = loginUser(info);
+    send(client->socket, &(client->authenticated), sizeof(int), 0);
     if (client->authenticated)
     {
-        dbGetUser(client, info.name);
-        printf("%s joined the chat\n",client->username);
+        dbGetUser(client, info.username);
+        printf("%s joined the chat\n", client->username); // TODO: send to server with join flag
     }
 }
 
@@ -87,9 +88,9 @@ void authRegister(ClientList *client)
         else
         {
             recv(client->socket, &info, sizeof(CLIENT), 0);
-            int userExist = dbAuth(info);
-            send(client->socket, &userExist, sizeof(int), 0);
-            if (userExist)
+            int created = createUser(info);
+            send(client->socket, &created, sizeof(int), 0);
+            if (!created)
             {
                 client->authenticated = 0;
                 return;
@@ -97,13 +98,12 @@ void authRegister(ClientList *client)
             else
             {
                 client->authenticated = 1;
-                // dbStore;
             }
         }
     }
     if (client->authenticated)
     {
-        dbGetUser(client, info.name);
+        dbGetUser(client, info.username);
     }
 }
 

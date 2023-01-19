@@ -7,10 +7,16 @@
 
 #include "list.h"
 #include "user.h"
-#include "db.h"
 
+typedef struct 
+{
+    char username[20];
+    char password[20];
+
+} CLIENT;
 
 extern User *user;
+
 
 void *c_handler(void *);
 void sendAll(ClientList *, char *);
@@ -21,12 +27,5 @@ void authRegister(ClientList *);
 
 
 
-typedef struct _CLIENT
-{
-    char name[20];
-    char password[20];
-
-} CLIENT;
-
-
 #endif // __CLIENT_HANDLER__
+

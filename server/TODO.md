@@ -1,0 +1,3 @@
+- [ ] database authentication
+- [ ] SSL encryption
+- [ ] client handling for exit signal

@@ -4,3 +4,4 @@
 - [ ] /unread 
 - [X] create chatting interface
 - [ ] function_button for online
+- [ ] tokenize string and color

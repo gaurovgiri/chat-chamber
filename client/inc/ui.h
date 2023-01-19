@@ -24,6 +24,4 @@ void deleteWin(WINDOW *);
 void resizeMsg(WINDOW *);
 void resizeInp(WINDOW *);
 
-void resize_handler(int);
-
 #endif // __UI__

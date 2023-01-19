@@ -6,6 +6,9 @@
 #include "client.h"
 
 int authenticated = 0, error = 0;
+CLIENT info;
+
+
 int menu(char *options[], int option_len)
 {
     WINDOW *menuWin = newwin(stdscr->_maxy, stdscr->_maxx, 0, 0);
@@ -110,11 +113,12 @@ void loginPage()
 
     wrefresh(loginBox);
 
-    char username[20];
-    char password[20];
+    memset(info.username, 0, sizeof(info.username));
+    memset(info.password, 0, sizeof(info.password));
+
     echo();
     curs_set(1);
-    mvwgetstr(loginBox, 2, 12, username);
+    mvwgetstr(loginBox, 2, 12, info.username);
     noecho();
     int i = 0;
     while (true)
@@ -135,18 +139,19 @@ void loginPage()
                 wrefresh(loginBox);
             }
         }
+        else if (i >= sizeof(info.password))
+        {
+            beep();
+        }
         else
         {
-            password[i] = ch;
+            info.password[i] = ch;
             mvwaddch(loginBox, 3, 12 + i, '*');
             i++;
             wrefresh(loginBox);
         }
     }
 
-    CLIENT info;
-    strcpy(info.username, username);
-    strcpy(info.password, password);
     send(sockfd, &info, sizeof(CLIENT), 0);
 
     recv(sockfd, &authenticated, sizeof(int), 0);
@@ -274,19 +279,19 @@ void registerPage()
     }
     else
     {
-        CLIENT info;
-        int userExist;
+        int created;
+        memset(&info, 0, sizeof(info));
         strcpy(info.username, username);
         strcpy(info.password, password);
         send(sockfd, &info, sizeof(CLIENT), 0);
-        recv(sockfd, &userExist, sizeof(int), 0);
-        if (userExist)
+        recv(sockfd, &created, sizeof(int), 0);
+        if (!created)
         {
             popup("Username already exists!", -1);
         }
         else
         {
-            authenticated = !userExist;
+            authenticated = created;
         }
     }
     curs_set(0);
@@ -300,7 +305,12 @@ WINDOW *createMessageBox()
     getmaxyx(stdscr, rows, cols);                      // Get the maximum screen dimensions
     WINDOW *messageWin = newwin(rows - 5, cols, 0, 0); // Create a new window for the messages
     scrollok(messageWin, TRUE);                        // Allow scrolling in the messages window
-    wrefresh(messageWin);                              // Refresh the messages window
+
+    werase(stdscr);
+    refresh();
+
+    werase(messageWin);
+    wrefresh(messageWin); // Refresh the messages window
     return messageWin;
 }
 
@@ -310,6 +320,10 @@ WINDOW *createInputBox()
     getmaxyx(stdscr, rows, cols);
     WINDOW *inputWin = newwin(3, cols, rows - 4, 0);
     box(inputWin, 0, 0);
+
+    werase(stdscr);
+    refresh();
+    werase(inputWin);
     wrefresh(inputWin);
     return inputWin;
 }

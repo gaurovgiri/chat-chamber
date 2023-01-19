@@ -44,7 +44,7 @@ void send_msg_handler()
         while (true)
         {
             ch = mvwgetch(inputWin, 1, 1 + i);
-            if (ch == '\n' || i >= sizeof(sendMessage.msg))
+            if (ch == '\n')
             {
                 break;
             }
@@ -64,6 +64,10 @@ void send_msg_handler()
                 resizeInp(inputWin);
                 wrefresh(messageWin);
                 wrefresh(inputWin);
+            }
+            else if (i >= sizeof(sendMessage.msg))
+            {
+                beep();
             }
             else
             {
