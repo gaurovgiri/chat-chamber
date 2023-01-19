@@ -1,6 +1,7 @@
 #include "chat.h"
 #include "ui.h"
 #include "client.h"
+#include "messages.h"
 #include <ncurses.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -28,7 +29,7 @@ void recv_msg_handler()
 
 void send_msg_handler()
 {
-    char sendMessage[101];
+    Message sendMessage;
     WINDOW *inputWin = createInputBox();
     wrefresh(inputWin);
     int i, ch;
@@ -36,14 +37,14 @@ void send_msg_handler()
     curs_set(1);
     while (1)
     {
-        memset(sendMessage, 0, sizeof(sendMessage));
+        memset(&sendMessage, 0, sizeof(sendMessage));
         box(inputWin, 0, 0);
         wrefresh(inputWin);
         i = 0;
         while (true)
         {
             ch = mvwgetch(inputWin, 1, 1 + i);
-            if (ch == '\n' || i >= sizeof(sendMessage))
+            if (ch == '\n' || i >= sizeof(sendMessage.msg))
             {
                 break;
             }
@@ -66,7 +67,7 @@ void send_msg_handler()
             }
             else
             {
-                sendMessage[i] = (char)ch;
+                sendMessage.msg[i] = (char)ch;
                 mvwaddch(inputWin, 1, 1 + i, (char)ch);
                 i++;
                 wrefresh(inputWin);
@@ -76,7 +77,7 @@ void send_msg_handler()
         wrefresh(inputWin);
 
         // displayOn(messageWin,sendMessage);
-        send(sockfd, sendMessage, sizeof(sendMessage), 0);
+        send(sockfd, &sendMessage, sizeof(sendMessage), 0);
     }
     deleteWin(inputWin);
     noecho();
