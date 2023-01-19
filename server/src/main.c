@@ -4,9 +4,16 @@
 #include <stdlib.h>
 #include <db.h>
 #include <string.h>
+#include "ssl.h"
 
 int main(int argc, char const *argv[])
 {
+    if (!isRoot())
+    {
+        printf("This program must be run as root/sudo user!!");
+        exit(0);
+    }
+
     int started;
     short port;
     signal(SIGINT, catch_ctrl_c_and_exit);
@@ -25,7 +32,7 @@ int main(int argc, char const *argv[])
     {
         port = (short)atoi(argv[1]);
     }
-    
+
     initDB();
     started = startServer(port);
     return 0;

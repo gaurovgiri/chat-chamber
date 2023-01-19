@@ -5,6 +5,7 @@
 #define SUCCESS_0 0 // Code Status for successful connection to the server
 #include <sys/socket.h>
 
+
 extern int sockfd, leaveFlag;
 extern struct sockaddr_in server_info, client_info;
 

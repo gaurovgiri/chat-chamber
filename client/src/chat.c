@@ -5,6 +5,7 @@
 #include <ncurses.h>
 #include <string.h>
 #include <sys/socket.h>
+#include "ssl.h"
 
 WINDOW *messageWin;
 
@@ -17,7 +18,7 @@ void recv_msg_handler()
     {
         // curs_set(0);
         memset(receivedMessage, 0, sizeof(receivedMessage));
-        recvStatus = recv(sockfd, receivedMessage, sizeof(receivedMessage), 0);
+        recvStatus = SSL_read(ssl, receivedMessage, sizeof(receivedMessage));
 
         if (recvStatus > 0)
         {
@@ -81,7 +82,7 @@ void send_msg_handler()
         wrefresh(inputWin);
 
         // displayOn(messageWin,sendMessage);
-        send(sockfd, &sendMessage, sizeof(sendMessage), 0);
+        SSL_write(ssl, &sendMessage, sizeof(sendMessage));
     }
     deleteWin(inputWin);
     noecho();

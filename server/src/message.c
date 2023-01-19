@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include "ssl.h"
 
 void sendAll(ClientList *client, char *message)
 {
@@ -12,7 +13,7 @@ void sendAll(ClientList *client, char *message)
     {
         sprintf(sendMsg,"%s: %s",(client->socket == tmp->socket ?"You":client->username),message);
         printf("Send to socket %d: \"%s\" \n", tmp->socket, message);
-        send(tmp->socket, sendMsg, sizeof(sendMsg), 0);
+        SSL_write(tmp->ssl, sendMsg, sizeof(sendMsg));
         tmp = tmp->next;
     }
 }

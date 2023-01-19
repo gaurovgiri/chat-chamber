@@ -7,13 +7,15 @@
 #include "popup.h"
 #include "ui.h"
 #include "chat.h"
+#include "ssl.h"
+
 
 int main(int argc, char const *argv[])
 {
 
     int connected;
     signal(SIGINT, catch_ctrl_c_and_exit);
-    initscr();
+    
     atexit(cleanup);
 
 
@@ -34,7 +36,9 @@ int main(int argc, char const *argv[])
         strncpy(ip, argv[1], sizeof(ip));
         port = (short)atoi(argv[2]);
     }
-    refresh();
+
+
+    initscr();
     connectionStatus(connected = connectToServer(ip, port));
 
     if (connected == SUCCESS_0)

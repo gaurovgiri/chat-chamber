@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include "ssl.h"
 
 int s_sockfd, c_sockfd;
 struct sockaddr_in server_info, client_info;
@@ -23,8 +24,21 @@ void cleanup()
     // endwin();
 }
 
+
+
+
 int startServer(short port)
 {
+
+    SSL_CTX *ctx;
+
+    SSL_library_init();
+    ctx = InitServerCTX();
+
+    LoadCertificates(ctx,"certs/certi.pem","certs/certi.pem");
+
+    
+
     int s_addrlen = sizeof(server_info);
     int c_addrlen = sizeof(client_info);
 
@@ -40,10 +54,15 @@ int startServer(short port)
     server_info.sin_addr.s_addr = INADDR_ANY;
 
     bind(s_sockfd, (struct sockaddr *)&server_info, s_addrlen);
+    
     listen(s_sockfd, 5);
 
-    getsockname(s_sockfd, (struct sockaddr *)&server_info, (socklen_t *)&s_addrlen);
+    getsockname(s_sockfd, (struct sockaddr *)&server_info, (socklen_t *)&s_addrlen);    
     printf("Listening on %s:%d\n", inet_ntoa(server_info.sin_addr), ntohs(server_info.sin_port));
+
+    SSL *ssl;
+
+
 
     head = addNode(s_sockfd, inet_ntoa(server_info.sin_addr));
     curr = head;
@@ -55,8 +74,10 @@ int startServer(short port)
         getpeername(c_sockfd, (struct sockaddr *)&client_info, (socklen_t *)&c_addrlen);
 
         printf("Connecting with %s:%d\n", inet_ntoa(client_info.sin_addr), ntohs(client_info.sin_port));
-
+        ssl = SSL_new(ctx);
+        SSL_set_fd(ssl,c_sockfd);
         client = addNode(c_sockfd, inet_ntoa(client_info.sin_addr));
+        client->ssl = ssl;
         client->prev = (ClientList *)curr;
         curr->next = client;
         curr = client;

@@ -1,7 +1,7 @@
 #ifndef __LIST__
 #define __LIST__
 
-
+#include "ssl.h"
 typedef struct Nodes
 {
     int socket;
@@ -12,6 +12,7 @@ typedef struct Nodes
     int role;
     int leave_flag;
     int authenticated;
+    SSL *ssl;
 } ClientList;
 
 extern ClientList *head, *curr;

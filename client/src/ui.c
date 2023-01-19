@@ -4,10 +4,10 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include "client.h"
+#include "ssl.h"
 
 int authenticated = 0, error = 0;
 CLIENT info;
-
 
 int menu(char *options[], int option_len)
 {
@@ -76,7 +76,7 @@ void loginOrReg()
     {
         choice = menu(options, 3);
 
-        send(sockfd, &choice, sizeof(int), 0); // 1
+        SSL_write(ssl, &choice, sizeof(int));
         switch (choice)
         {
         case LOGIN:
@@ -152,9 +152,9 @@ void loginPage()
         }
     }
 
-    send(sockfd, &info, sizeof(CLIENT), 0);
+    SSL_write(ssl, &info, sizeof(CLIENT));
 
-    recv(sockfd, &authenticated, sizeof(int), 0);
+    SSL_read(ssl, &authenticated, sizeof(int));
     if (!authenticated)
     {
         popup("Authentication Failed!", -1);
@@ -184,9 +184,9 @@ void registerPage()
     echo();
 
     mvwgetstr(regBox, 1, 18, code);
-    send(sockfd, code, sizeof(code), 0);
+    SSL_write(ssl, code, sizeof(code));
     int validCode;
-    recv(sockfd, &validCode, sizeof(int), 0);
+    SSL_read(ssl, &validCode, sizeof(int));
 
     if (validCode)
     {
@@ -272,7 +272,7 @@ void registerPage()
         popup("Bad Invitation Code", -1);
         return;
     }
-    send(sockfd, &error, sizeof(int), 0);
+    SSL_write(ssl, &error, sizeof(int));
     if (error)
     {
         error = 0;
@@ -283,8 +283,8 @@ void registerPage()
         memset(&info, 0, sizeof(info));
         strcpy(info.username, username);
         strcpy(info.password, password);
-        send(sockfd, &info, sizeof(CLIENT), 0);
-        recv(sockfd, &created, sizeof(int), 0);
+        SSL_write(ssl, &info, sizeof(CLIENT));
+        SSL_read(ssl, &created, sizeof(int));
         if (!created)
         {
             popup("Username already exists!", -1);

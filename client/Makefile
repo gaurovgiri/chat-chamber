@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -I inc
-LIBS = -lncurses -lm
+LIBS = -lncurses -lm -L/usr/lib -lssl -lcrypto
 
 
 SOURCES = $(filter-out src/main.c, $(wildcard src/*.c))
