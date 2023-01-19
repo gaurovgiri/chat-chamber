@@ -16,13 +16,13 @@ void *c_handler(void *client_t)
         loginOrReg(client);
     } while (!client->authenticated);
 
-    char message[101];
+    Message message;
 
     while (!client->leave_flag)
     {
-        memset(message, 0, sizeof(message));
-        recv(client->socket, message, sizeof(message), 0);
-        sendAll(client,message);
+        memset(&message, 0, sizeof(message));
+        recv(client->socket, &message, sizeof(message), 0);
+        sendAll(client,message.msg);
     }
     closeSocket(client);
 }

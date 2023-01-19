@@ -3,6 +3,7 @@
 
 #define MSG 0
 #define CMD 1
+#define LEAVE 2
 
 #include "client_handler.h"
 
@@ -10,8 +11,8 @@ typedef struct msg
 {
     int flag;
     char msg[101];
-} Message;
 
+} Message;
 
 void sendAll(ClientList *, char *);
 void sendOne(ClientList *, char *);
