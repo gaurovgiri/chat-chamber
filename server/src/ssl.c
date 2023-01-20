@@ -23,38 +23,7 @@
 
 #define BUFFER 1024 /*buffer for reading messages*/
 
-int OpenListener(int port)
 
-{
-    int sd;
-    struct sockaddr_in addr; /*creating the sockets*/
-    sd = socket(PF_INET, SOCK_STREAM, 0);
-    bzero(&addr, sizeof(addr)); /*free output the garbage space in memory*/
-
-    addr.sin_family = AF_INET;   /*getting ip address form machine */
-    addr.sin_port = htons(port); /* converting host bit to n/w bit */
-    addr.sin_addr.s_addr = INADDR_ANY;
-
-    if (bind(sd, (struct sockaddr *)&addr, sizeof(addr)) != 0) /* assiging the ip address and port*/
-
-    {
-
-        perror("can't bind port"); /* reporting error using errno.h library */
-
-        abort(); /*if error will be there then abort the process */
-    }
-
-    if (listen(sd, 10) != 0) /*for listening to max of 10 clients in the queue*/
-
-    {
-
-        perror("Can't configure listening port"); /* reporting error using errno.h library */
-
-        abort(); /*if erroor will be there then abort the process */
-    }
-
-    return sd;
-}
 
 int isRoot() /*for checking if the root user is executing the server*/
 

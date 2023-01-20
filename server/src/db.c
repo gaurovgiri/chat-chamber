@@ -72,7 +72,6 @@ int createUser(CLIENT info)
 void dbGetUser(ClientList *client, char *name)
 {
     strcpy(client->username, name);
-    client->role = ADMIN;
 }
 
 int dbValidate(char *invitationCode)

@@ -9,6 +9,10 @@
 
 #include "client_handler.h"
 
+/**
+ * @brief creates a new structure that holds flag and message and sender username.
+ * 
+ */
 typedef struct msg
 {
     int flag;
@@ -17,8 +21,16 @@ typedef struct msg
 
 } Message;
 
+/**
+ * @brief send message structure to all the clients
+ * 
+ * @param [client] point of ClientList that holds the information of conencted Clients
+ * @param [message] object of Message that stores the  
+ */
 void sendAll(ClientList *, Message);
-void sendOne(ClientList *, char *);
+
+
+// void sendOne(List *, char *);
 
 
 #endif // __MESSAGE__
