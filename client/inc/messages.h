@@ -7,6 +7,10 @@
 #define LEAVE 3
 #define STOP 4
 
+/**
+ * @brief creates a new structure that holds flag , message and sender username.
+ * 
+ */
 typedef struct msg
 {
     int flag;
