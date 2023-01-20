@@ -7,6 +7,7 @@
 
 #include "list.h"
 #include "user.h"
+#include "message.h"
 
 typedef struct 
 {
@@ -19,7 +20,6 @@ extern User *user;
 
 
 void *c_handler(void *);
-void sendAll(ClientList *, char *);
 void closeSocket(ClientList *);
 void loginOrReg(ClientList *);
 void authLogin(ClientList *);
@@ -28,4 +28,3 @@ void authRegister(ClientList *);
 
 
 #endif // __CLIENT_HANDLER__
-

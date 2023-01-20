@@ -10,8 +10,7 @@
 #include "client.h"
 #include "popup.h"
 #include "ssl.h"
-
-
+#include "messages.h"
 
 SSL *ssl;
 
@@ -25,10 +24,16 @@ void catch_ctrl_c_and_exit(int sig)
 
 void cleanup()
 {
-    leaveFlag = 1;
-    SSL_free(ssl);
-    close(sockfd);
-    SSL_CTX_free(ctx);
+    if (connected == SUCCESS_0)
+    {
+        Message msg;
+        msg.flag = LEAVE;
+        SSL_write(ssl, &msg, sizeof(Message));
+
+        SSL_free(ssl);
+        close(sockfd);
+        SSL_CTX_free(ctx);
+    }
     endwin();
 }
 
@@ -50,6 +55,7 @@ int connectToServer(char server_ip[], short server_port)
     int s_addrlen = sizeof(server_info);
     int c_addrlen = sizeof(client_info);
     int err;
+
     memset(&server_info, 0, s_addrlen);
     memset(&client_info, 0, c_addrlen);
 
@@ -69,7 +75,6 @@ int connectToServer(char server_ip[], short server_port)
 
     getsockname(sockfd, (struct sockaddr *)&client_info, (socklen_t *)&c_addrlen);
     getpeername(sockfd, (struct sockaddr *)&server_info, (socklen_t *)&s_addrlen);
-    
 
     SSL_set_fd(ssl, sockfd);
 

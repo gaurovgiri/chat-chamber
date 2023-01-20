@@ -16,6 +16,7 @@ int main(int argc, char const *argv[])
 
     int started;
     short port;
+    atexit(cleanup);
     signal(SIGINT, catch_ctrl_c_and_exit);
 
     if (argc <= 1)

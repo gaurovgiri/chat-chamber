@@ -86,6 +86,7 @@ void loginOrReg()
             registerPage();
             break;
         case _EXIT:
+            close(sockfd);
             exit(0);
         default:
             break;
@@ -305,10 +306,11 @@ WINDOW *createMessageBox()
     getmaxyx(stdscr, rows, cols);                      // Get the maximum screen dimensions
     WINDOW *messageWin = newwin(rows - 5, cols, 0, 0); // Create a new window for the messages
     scrollok(messageWin, TRUE);                        // Allow scrolling in the messages window
-
+    
     werase(stdscr);
     refresh();
 
+    wbkgd(messageWin,COLOR_PAIR(1));
     werase(messageWin);
     wrefresh(messageWin); // Refresh the messages window
     return messageWin;
@@ -328,9 +330,31 @@ WINDOW *createInputBox()
     return inputWin;
 }
 
-void displayOn(WINDOW *screen, char *msg)
+void displayOn(WINDOW *screen, Message message)
 {
-    wprintw(screen, "%s\n", msg);
+    switch (message.flag)
+    {
+    case MSG:
+        wprintw(screen, "%s: %s\n", message.sender, message.msg);
+        break;
+
+    case JOIN:
+        wprintw(screen, "[ %s ] joined the chat\n",message.sender);
+        break;
+
+    case LEAVE:
+        wprintw(screen, "[ %s ] left the chat\n",message.sender);
+        break;
+    case STOP:
+        popup("SERVER CONNECTION CLOSED",-1);
+        leaveFlag = 1;
+        break;
+    case CMD:
+        break;
+
+    default:
+        break;
+    }
     wrefresh(screen);
 }
 

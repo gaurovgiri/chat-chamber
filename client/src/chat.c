@@ -1,24 +1,24 @@
+#include <ncurses.h>
+#include <string.h>
+#include <sys/socket.h>
 #include "chat.h"
 #include "ui.h"
 #include "client.h"
 #include "messages.h"
-#include <ncurses.h>
-#include <string.h>
-#include <sys/socket.h>
 #include "ssl.h"
 
 WINDOW *messageWin;
 
 void recv_msg_handler()
 {
-    char receivedMessage[123];
+    Message receivedMessage;
     int recvStatus;
     messageWin = createMessageBox();
-    while (1)
+    while (!leaveFlag)
     {
         // curs_set(0);
-        memset(receivedMessage, 0, sizeof(receivedMessage));
-        recvStatus = SSL_read(ssl, receivedMessage, sizeof(receivedMessage));
+        memset(&receivedMessage, 0, sizeof(receivedMessage));
+        recvStatus = SSL_read(ssl, &receivedMessage, sizeof(Message));
 
         if (recvStatus > 0)
         {
@@ -32,6 +32,11 @@ void send_msg_handler()
 {
     Message sendMessage;
     WINDOW *inputWin = createInputBox();
+
+    sendMessage.flag = JOIN;
+
+    SSL_write(ssl, &sendMessage, sizeof(Message));
+
     wrefresh(inputWin);
     int i, ch;
     noecho();
@@ -42,10 +47,10 @@ void send_msg_handler()
         box(inputWin, 0, 0);
         wrefresh(inputWin);
         i = 0;
-        while (true)
+        while (!leaveFlag)
         {
             ch = mvwgetch(inputWin, 1, 1 + i);
-            if (ch == '\n')
+            if (ch == '\n' && i > 0)
             {
                 break;
             }
@@ -81,8 +86,17 @@ void send_msg_handler()
         werase(inputWin);
         wrefresh(inputWin);
 
-        // displayOn(messageWin,sendMessage);
-        SSL_write(ssl, &sendMessage, sizeof(sendMessage));
+        if (strncmp(sendMessage.msg, "/exit", sizeof("/exit")) == 0)
+        {
+            leaveFlag = 1;
+            break;
+        }
+        else
+        {
+            sendMessage.flag = MSG;
+            SSL_write(ssl, &sendMessage, sizeof(sendMessage));
+            
+        }
     }
     deleteWin(inputWin);
     noecho();

@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 
 
-extern int sockfd, leaveFlag;
+extern int sockfd, leaveFlag,connected;
 extern struct sockaddr_in server_info, client_info;
 
 void catch_ctrl_c_and_exit(int);

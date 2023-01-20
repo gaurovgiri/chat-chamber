@@ -5,15 +5,17 @@
 #include <sys/socket.h>
 #include "ssl.h"
 
-void sendAll(ClientList *client, char *message)
+void sendAll(ClientList *client, Message message)
 {
     ClientList *tmp = (ClientList *)head->next;
-    char sendMsg[123];
-    while (tmp != NULL)
+    while (tmp != NULL && !(tmp->leave_flag))
     {
-        sprintf(sendMsg,"%s: %s",(client->socket == tmp->socket ?"You":client->username),message);
-        printf("Send to socket %d: \"%s\" \n", tmp->socket, message);
-        SSL_write(tmp->ssl, sendMsg, sizeof(sendMsg));
+        printf("Send to socket %d: \"%s\" \n", tmp->socket, message.msg);
+        if (tmp->socket == client->socket)
+        {
+            strncpy(message.sender, "You", sizeof("You"));
+        }
+        SSL_write(tmp->ssl, &message, sizeof(Message));
         tmp = tmp->next;
     }
 }

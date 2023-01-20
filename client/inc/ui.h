@@ -6,7 +6,7 @@
 #define _EXIT 2
 
 #include <ncurses.h>
-
+#include <messages.h>
 
 int menu(char *[], int);
 void loginOrReg();
@@ -17,7 +17,7 @@ void registerPage();
 WINDOW *createMessageBox();
 WINDOW *createInputBox();
 
-void displayOn(WINDOW *, char *);
+void displayOn(WINDOW *, Message);
 
 void deleteWin(WINDOW *);
 

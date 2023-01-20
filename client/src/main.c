@@ -8,16 +8,17 @@
 #include "ui.h"
 #include "chat.h"
 #include "ssl.h"
+#include "color.h"
 
+
+int connected;
 
 int main(int argc, char const *argv[])
 {
 
-    int connected;
     signal(SIGINT, catch_ctrl_c_and_exit);
-    
-    atexit(cleanup);
 
+    atexit(cleanup);
 
     char ip[17];
     short port;
@@ -37,16 +38,14 @@ int main(int argc, char const *argv[])
         port = (short)atoi(argv[2]);
     }
 
-
     initscr();
+    leaveFlag = 0;
     connectionStatus(connected = connectToServer(ip, port));
 
     if (connected == SUCCESS_0)
         loginOrReg();
     else
-        exit(EXIT_0);
-
-
+        leaveFlag = 1;
 
     if (!leaveFlag)
     {

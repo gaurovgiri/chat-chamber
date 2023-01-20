@@ -17,12 +17,10 @@ void *c_handler(void *client_t)
 
     else
     {
-        ShowCerts(client->ssl);
-
         do
         {
             loginOrReg(client);
-        } while (!client->authenticated);
+        } while (!client->authenticated && !client->leave_flag);
 
         Message message;
 
@@ -30,9 +28,33 @@ void *c_handler(void *client_t)
         {
             memset(&message, 0, sizeof(message));
             SSL_read(client->ssl, &message, sizeof(message));
-            sendAll(client, message.msg);
+
+            strncpy(message.sender, client->username, sizeof(client->username));
+
+            switch (message.flag)
+            {
+            case MSG:
+                sendAll(client, message);
+                break;
+
+            case JOIN:
+                sendAll(client, message);
+                break;
+
+            case LEAVE:
+                client->leave_flag = 1;
+                strncpy(message.msg, "", 0);
+                sendAll(client, message);
+                break;
+
+            case CMD:
+                break;
+            default:
+                break;
+            }
         }
     }
+    printf("Closing Connection with socket: %d\n",client->socket);
     closeSocket(client);
 }
 
@@ -50,7 +72,7 @@ void loginOrReg(ClientList *client)
         break;
 
     case _EXIT:
-        closeSocket(client);
+        client->leave_flag = 1;
         break;
 
     default:
@@ -118,7 +140,6 @@ void authRegister(ClientList *client)
 
 void closeSocket(ClientList *client)
 {
-
     SSL_free(client->ssl);
     close(client->socket);
     if (client == curr)

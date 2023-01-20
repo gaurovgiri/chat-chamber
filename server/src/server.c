@@ -20,12 +20,16 @@ void catch_ctrl_c_and_exit(int sig)
 
 void cleanup()
 {
-    // close(sockfd);
-    // endwin();
+    ClientList *tmp = (ClientList *)head->next;
+    Message msg;
+    msg.flag = STOP;
+    while (tmp != NULL)
+    { 
+        SSL_write(tmp->ssl,&msg,sizeof(msg));
+        closeSocket(tmp);
+        tmp = tmp->next;
+    }
 }
-
-
-
 
 int startServer(short port)
 {
@@ -35,9 +39,7 @@ int startServer(short port)
     SSL_library_init();
     ctx = InitServerCTX();
 
-    LoadCertificates(ctx,"certs/certi.pem","certs/certi.pem");
-
-    
+    LoadCertificates(ctx, "certs/certi.pem", "certs/certi.pem");
 
     int s_addrlen = sizeof(server_info);
     int c_addrlen = sizeof(client_info);
@@ -54,15 +56,13 @@ int startServer(short port)
     server_info.sin_addr.s_addr = INADDR_ANY;
 
     bind(s_sockfd, (struct sockaddr *)&server_info, s_addrlen);
-    
+
     listen(s_sockfd, 5);
 
-    getsockname(s_sockfd, (struct sockaddr *)&server_info, (socklen_t *)&s_addrlen);    
+    getsockname(s_sockfd, (struct sockaddr *)&server_info, (socklen_t *)&s_addrlen);
     printf("Listening on %s:%d\n", inet_ntoa(server_info.sin_addr), ntohs(server_info.sin_port));
 
     SSL *ssl;
-
-
 
     head = addNode(s_sockfd, inet_ntoa(server_info.sin_addr));
     curr = head;
@@ -75,7 +75,7 @@ int startServer(short port)
 
         printf("Connecting with %s:%d\n", inet_ntoa(client_info.sin_addr), ntohs(client_info.sin_port));
         ssl = SSL_new(ctx);
-        SSL_set_fd(ssl,c_sockfd);
+        SSL_set_fd(ssl, c_sockfd);
         client = addNode(c_sockfd, inet_ntoa(client_info.sin_addr));
         client->ssl = ssl;
         client->prev = (ClientList *)curr;

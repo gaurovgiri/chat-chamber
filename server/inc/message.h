@@ -3,19 +3,22 @@
 
 #define MSG 0
 #define CMD 1
-#define LEAVE 2
+#define JOIN 2
+#define LEAVE 3
+#define STOP 4
 
 #include "client_handler.h"
 
 typedef struct msg
 {
     int flag;
+    char sender[20];
     char msg[101];
 
 } Message;
 
-void sendAll(ClientList *, char *);
+void sendAll(ClientList *, Message);
 void sendOne(ClientList *, char *);
-char **parseCommand(char *);
+
 
 #endif // __MESSAGE__
