@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -I inc
-LIBS = -lncurses -lm -L/usr/lib -lssl -lcrypto
+LIBS = -lncurses -L/usr/lib -lssl -lcrypto
 
 
 SOURCES = $(filter-out src/main.c, $(wildcard src/*.c))
@@ -20,9 +20,6 @@ obj/%.o: src/%.c
 
 obj/main.o: src/main.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
-
-test:
-	gcc -I inc test.c -o test -lncurses && ./test
 
 
 .PHONY: clean

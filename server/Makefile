@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -I inc
-LIBS = -lncurses -lm -lsqlite3 -L/usr/lib -lssl -lcrypto
+LIBS = -lncurses -lsqlite3 -L/usr/lib -lssl -lcrypto
 
 CERTS = certs
 SOURCES = $(filter-out src/main.c, $(wildcard src/*.c))

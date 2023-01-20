@@ -1,7 +1,0 @@
-- [X] fix when connecting to 142.250.193.174 88
-- [X] Login or Register
-- [ ] /loadmsg
-- [ ] /unread 
-- [X] create chatting interface
-- [ ] function_button for online
-- [ ] tokenize string and color
