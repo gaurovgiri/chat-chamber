@@ -8,8 +8,17 @@
 
 #include <ncurses.h>
 
-
+/**
+ * @brief 
+ * 
+ */
 void popup(const char *, int);
+/**
+ * @brief checks the connection status 
+ * 
+ * if status is successful then successful connection to the entered ip and port is displayed.
+ * if status is .. then couldn't find thte connection is displayed.
+ */
 void connectionStatus(int);
 
 
