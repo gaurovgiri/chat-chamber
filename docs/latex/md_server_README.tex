@@ -1,0 +1,30 @@
+This guide will explain how to run the ./bin/server binary, which is created after running the make command. The application also includes a install.\+sh script and a Dockerfile for running the application in a container. \hypertarget{md_server_README_autotoc_md9}{}\doxysection{Prerequisites}\label{md_server_README_autotoc_md9}
+\begin{DoxyVerb}- A Unix-based operating system (Windows users can use the Windows Subsystem for Linux (WSL))
+GCC, the GNU Compiler Collection
+- Make
+- Docker (if you want to run the application in a container)
+\end{DoxyVerb}
+ \hypertarget{md_server_README_autotoc_md10}{}\doxysection{Running the Application}\label{md_server_README_autotoc_md10}
+\hypertarget{md_server_README_autotoc_md11}{}\doxysubsection{Using Make}\label{md_server_README_autotoc_md11}
+\begin{DoxyVerb}Run the install.sh script to install the required libraries and dependencies.
+\end{DoxyVerb}
+ {\ttfamily ./install.sh} \begin{DoxyVerb}Run the make command to build the binary.
+\end{DoxyVerb}
+ {\ttfamily make} \begin{DoxyVerb}Run the binary with the port as command-line argument.
+\end{DoxyVerb}
+ {\ttfamily ./bin/server $<$port$>$}\hypertarget{md_server_README_autotoc_md12}{}\doxysubsection{Using Docker}\label{md_server_README_autotoc_md12}
+\begin{DoxyVerb}Build the image using the provided Dockerfile.
+\end{DoxyVerb}
+ {\ttfamily docker build -\/t myserver .} \begin{DoxyVerb}Run the container and pass the port as command-line argument.
+\end{DoxyVerb}
+ {\ttfamily docker run -\/-\/name myservercontainer -\/p $<$port$>$\+:$<$port$>$ myserver $<$port$>$}\hypertarget{md_server_README_autotoc_md13}{}\doxysubsection{Notes}\label{md_server_README_autotoc_md13}
+\begin{DoxyVerb}Make sure that the install.sh script and Dockerfile are in the same directory as the Makefile.
+Make sure that the make command in your makefile is building the server binary and it is located at ./bin/server and the installation script is located at ./install.sh and it is executable.
+Make sure that the port you specify is available on your system.
+\end{DoxyVerb}
+ \hypertarget{md_server_README_autotoc_md14}{}\doxysubsection{Troubleshooting}\label{md_server_README_autotoc_md14}
+\begin{DoxyVerb}If you encounter any issues while building the binary, check that all the dependencies are installed and that the install.sh script is executable.
+If you encounter any issues while running the container, check that the port is correct and available on your system.
+If you encounter any other issues, please check the logs or contact the developer for assistance.
+\end{DoxyVerb}
+ Please note that this is just a basic example and the actual steps may vary depending on the specific requirements of your application. Also, make sure to read and understand the source code and any additional documentation provided with the application before running it. 

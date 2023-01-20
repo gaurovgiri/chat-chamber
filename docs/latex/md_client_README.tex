@@ -1,0 +1,46 @@
+\#\+Running the Client Application
+
+This guide will explain how to run the ./bin/client binary, which is created after running the make command. The application also includes a install.\+sh script and a Dockerfile for running the application in a container. Prerequisites \begin{DoxyVerb}A Unix-based operating system (Windows users can use the Windows Subsystem for Linux (WSL))
+GCC, the GNU Compiler Collection
+Make
+Docker (if you want to run the application in a container)
+\end{DoxyVerb}
+ \hypertarget{md_client_README_autotoc_md0}{}\doxysection{Running the Application}\label{md_client_README_autotoc_md0}
+\hypertarget{md_client_README_autotoc_md1}{}\doxysubsection{Using Make}\label{md_client_README_autotoc_md1}
+\begin{DoxyVerb}Run the install.sh script to install the required libraries and dependencies.
+
+./install.sh
+
+Run the make command to build the binary.
+
+`make`
+
+Run the binary with the server IP and port as command-line arguments.
+
+`./bin/client <server_ip> <server_port>`
+\end{DoxyVerb}
+ \hypertarget{md_client_README_autotoc_md2}{}\doxysubsection{Using Docker}\label{md_client_README_autotoc_md2}
+\begin{DoxyVerb}Build the image using the provided Dockerfile.
+
+`docker build -t myclient .`
+
+Run the container and pass the server IP and port as command-line arguments.
+
+`docker run --name myclientcontainer myclient <server_ip> <server_port>`
+\end{DoxyVerb}
+ \hypertarget{md_client_README_autotoc_md3}{}\doxysubsection{Without server IP and port}\label{md_client_README_autotoc_md3}
+\begin{DoxyVerb}If you don't have the server IP and port, you can run the binary without arguments, it will prompt you to enter the IP and port.
+
+`./bin/client`
+\end{DoxyVerb}
+ \hypertarget{md_client_README_autotoc_md4}{}\doxysubsection{Notes}\label{md_client_README_autotoc_md4}
+\begin{DoxyVerb}Make sure that the install.sh script and Dockerfile are in the same directory as the Makefile.
+Make sure that the make command in your makefile is building the client binary and it is located at ./bin/client and the installation script is located at ./install.sh and it is executable.
+Make sure that the server is running before running the client application.
+\end{DoxyVerb}
+ \hypertarget{md_client_README_autotoc_md5}{}\doxysubsection{Troubleshooting}\label{md_client_README_autotoc_md5}
+\begin{DoxyVerb} If you encounter any issues while building the binary, check that all the dependencies are installed and that the install.sh script is executable.
+ If you encounter any issues while running the container, check that the server IP and port are correct and that the server is running.
+ If you encounter any other issues, please check the logs or contact the developer for assistance.
+\end{DoxyVerb}
+ Please note that this is just a basic example and the actual steps may vary depending on the specific requirements of your application. Also, make sure to read and understand the source code and any additional documentation provided with the application before running it. 
